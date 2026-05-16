@@ -76,9 +76,6 @@
             background: #aa88cc;
             cursor: default;
         }
-        input[type=range]::-webkit-slider-runnable-track {
-            background: #decbff;
-        }
         .slider-info {
             font-size: 0.8rem;
             color: #8a6bbf;
@@ -151,9 +148,9 @@
         <!-- Ползунок и динамический запас -->
         <div class="stock-panel">
             <div class="stock-label">✨ доступно робуксов ✨</div>
-            <div class="stock-value" id="stockValueDisplay">150 000</div>
-            <input type="range" id="stockSlider" min="100" max="150000" value="150000" step="1" disabled>
-            <div class="slider-info">автоматическое обновление каждые 3 секунды</div>
+            <div class="stock-value" id="stockValueDisplay">600 000</div>
+            <input type="range" id="stockSlider" min="100" max="600000" value="600000" step="100" disabled>
+            <div class="slider-info">автоматическое обновление каждые 15 минут (имитация продаж)</div>
         </div>
 
         <div class="products-grid">
@@ -219,82 +216,57 @@
     }
     drawStars();
 
-    // --- автоматический цикл изменения запаса робуксов ---
-    let currentStock = 150000;  // начальное значение
+    // --- имитация продаж: начальное 600000, каждые 15 мин уменьшение на 1940, 5620, 10161 по циклу, при остатке <30000 сброс до 600000 ---
+    let currentStock = 600000;
     const stockDisplay = document.getElementById('stockValueDisplay');
     const stockSlider = document.getElementById('stockSlider');
+    // максимальное значение для ползунка - 600000, мин 100
+    stockSlider.max = 600000;
+    stockSlider.min = 100;
     
-    // последовательность значений для уменьшения
-    const decreaseSteps = [1940, 5620, 10161];
-    let stepIndex = 0;
-    let phase = 'decrease'; // 'decrease' или 'increase'
-    let increaseCounter = 0; // для прибавок 50000, 100000, потом сброс
+    const decreaseValues = [1940, 5620, 10161];
+    let stepIdx = 0;
     
     function updateStockUI() {
-        // округлим до целого
         currentStock = Math.round(currentStock);
         if (currentStock < 100) currentStock = 100;
-        if (currentStock > 150000) currentStock = 150000;
+        if (currentStock > 600000) currentStock = 600000;
         let formatted = currentStock.toLocaleString('ru-RU');
         stockDisplay.innerText = formatted;
         stockSlider.value = currentStock;
     }
     
-    function applyNextStockChange() {
-        if (phase === 'decrease') {
-            // если ещё есть шаги уменьшения
-            if (stepIndex < decreaseSteps.length) {
-                currentStock = decreaseSteps[stepIndex];
-                stepIndex++;
-                updateStockUI();
-                // после последнего шага проверим, меньше ли 5000
-                if (stepIndex === decreaseSteps.length && currentStock < 5000) {
-                    phase = 'increase';
-                    increaseCounter = 0;
-                    // сразу применим первое увеличение? нет, подождём следующего тика
-                }
-            } else {
-                // шаги кончились, но возможно запас уже меньше 5000
-                if (currentStock < 5000) {
-                    phase = 'increase';
-                    increaseCounter = 0;
-                } else {
-                    // если запас не меньше 5000, просто сбросим индекс и начнём заново
-                    stepIndex = 0;
-                    phase = 'decrease';
-                }
-            }
-        } 
-        else if (phase === 'increase') {
-            // увеличиваем в соответствии с counter: 0 -> +50000, 1 -> +100000, потом сброс цикла
-            if (increaseCounter === 0) {
-                currentStock += 50000;
-                increaseCounter++;
-            } else if (increaseCounter === 1) {
-                currentStock += 100000;
-                increaseCounter++;
-            } else {
-                // после двух прибавок возвращаемся к уменьшению, сбрасываем шаги
-                phase = 'decrease';
-                stepIndex = 0;
-                // также убедимся, что запас стал не менее 5000, но можно оставить как есть
-                if (currentStock < 5000) currentStock = 5000;
-                updateStockUI();
-                return;
-            }
-            updateStockUI();
-            // после увеличения проверяем, не стал ли запас больше 150000? ограничим
-            if (currentStock > 150000) currentStock = 150000;
-            updateStockUI();
-            // не переключаем фазу, следующий тик снова increase
+    function applyDecrease() {
+        if (stepIdx >= decreaseValues.length) {
+            stepIdx = 0; // если прошли все три, начинаем сначала
         }
-        updateStockUI();
+        let decrease = decreaseValues[stepIdx];
+        let newStock = currentStock - decrease;
+        if (newStock < 30000) {
+            // сбрасываем до 600000
+            currentStock = 600000;
+            stepIdx = 0;
+            updateStockUI();
+        } else {
+            currentStock = newStock;
+            stepIdx++;
+            updateStockUI();
+        }
+        // дополнительно проверим, не стало ли после уменьшения меньше 30000 (но это уже сделано)
+        if (currentStock < 30000 && currentStock !== 600000) {
+            currentStock = 600000;
+            stepIdx = 0;
+            updateStockUI();
+        }
     }
     
-    // запускаем цикл: каждые 3 секунды меняем запас
+    // запускаем интервал 15 минут (900000 миллисекунд)
     setInterval(() => {
-        applyNextStockChange();
-    }, 3000);
+        applyDecrease();
+    }, 900000); // 15 минут
+    
+    // начальный UI
+    updateStockUI();
     
     // красная метка (формальность)
     function showErrorToast() {
