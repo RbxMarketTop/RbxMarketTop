@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Robux Plus — подарочные карты</title>
+    <title>Excellent Shop — Robux & Robux Plus</title>
     <style>
         * {
             margin: 0;
@@ -17,13 +17,8 @@
             background: linear-gradient(145deg, #f0e6ff 0%, #e9d9ff 100%);
             position: relative;
             overflow-x: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
         }
 
-        /* canvas для звёздочек */
         #starCanvas {
             position: fixed;
             top: 0;
@@ -34,457 +29,698 @@
             z-index: 10;
         }
 
-        .container {
+        .app-container {
             position: relative;
             z-index: 20;
-            max-width: 600px;
             width: 100%;
+            max-width: 1300px;
             margin: 0 auto;
+            padding: 20px;
         }
 
-        /* карточка */
-        .card {
+        /* авторизация */
+        .auth-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+        .auth-card {
             background: rgba(255, 245, 255, 0.94);
             backdrop-filter: blur(12px);
             border: 1px solid #d9b8ff;
             border-radius: 48px;
-            padding: 32px 28px;
-            box-shadow: 0 20px 30px rgba(128, 0, 255, 0.15);
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 0 20px 30px rgba(128,0,255,0.1);
         }
-
-        .logo {
+        .auth-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #b16eff, #9b4eff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             text-align: center;
-            margin-bottom: 24px;
+        }
+        .auth-sub {
+            text-align: center;
+            color: #7a4f9e;
+            margin-bottom: 32px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px 20px;
+            background: #ffffffdd;
+            border: 1.5px solid #e2ccff;
+            border-radius: 60px;
+            color: #3b2b4d;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        .auth-btn {
+            width: 100%;
+            background: linear-gradient(95deg, #b87eff, #9c58e6);
+            border: none;
+            padding: 14px;
+            border-radius: 60px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+        .switch-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #6b4f8b;
+        }
+        .switch-text span {
+            color: #9b5eff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .error-msg {
+            color: #e07c7c;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 8px;
         }
 
+        /* магазин */
+        .store-container {
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #ffffffcc;
+            border-radius: 60px;
+            padding: 12px 24px;
+            margin-bottom: 30px;
+        }
         .logo h1 {
-            font-size: 2.4rem;
+            font-size: 1.9rem;
             background: linear-gradient(135deg, #b16eff, #9b4eff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
-
-        .logo p {
-            color: #7a4f9e;
-            font-size: 0.9rem;
-        }
-
-        .card-type {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .type-btn {
-            background: #f2eaff;
-            border: 2px solid #decbff;
+        .user-info {
+            background: #efdeff;
+            padding: 8px 20px;
             border-radius: 60px;
-            padding: 12px 28px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .logout-btn {
+            background: none;
+            border: 1px solid #c99494;
+            padding: 6px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .cart-icon-btn {
+            background: #decbff;
+            border: none;
+            border-radius: 60px;
+            padding: 10px 20px;
             font-weight: bold;
             font-size: 1rem;
+            color: #5d3b80;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .cart-icon-btn:hover {
+            background: #ceb5ff;
+            transform: scale(1.02);
+        }
+
+        /* табы */
+        .tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        .tab-btn {
+            background: #f0e4ff;
+            border: 2px solid #decbff;
+            border-radius: 60px;
+            padding: 12px 32px;
+            font-weight: bold;
+            font-size: 1.2rem;
             color: #6a37a3;
             cursor: pointer;
             transition: 0.2s;
-            width: 100%;
-            text-align: center;
         }
-
-        .type-btn.active {
+        .tab-btn.active {
             background: linear-gradient(95deg, #b87eff, #9c58e6);
             border-color: #b87eff;
             color: white;
             box-shadow: 0 4px 12px rgba(156, 88, 230, 0.3);
         }
-
-        .amount-section {
-            margin-bottom: 30px;
+        .tab-content {
+            display: none;
         }
-
-        .amount-label {
-            font-weight: 600;
-            color: #5d3b80;
-            margin-bottom: 12px;
+        .tab-content.active {
             display: block;
         }
 
+        /* товары robux */
+        .products-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .product-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            border: 1px solid #decbff;
+            border-radius: 32px;
+            padding: 24px 20px;
+            width: 260px;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-6px);
+            background: white;
+            border-color: #b77eff;
+        }
+        .price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #9b4eff;
+            margin: 14px 0;
+        }
+        .btn-buy {
+            background: linear-gradient(135deg, #c38eff, #a05fe8);
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* форма robux plus */
+        .plus-form {
+            background: #ffffffcc;
+            backdrop-filter: blur(8px);
+            border-radius: 48px;
+            padding: 30px;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+        .card-type {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .type-option {
+            flex: 1;
+            background: #f2eaff;
+            border: 2px solid #decbff;
+            border-radius: 60px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .type-option.active {
+            background: linear-gradient(95deg, #b87eff, #9c58e6);
+            border-color: #b87eff;
+            color: white;
+        }
         .amount-buttons {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
-            margin-bottom: 20px;
+            margin: 15px 0;
         }
-
-        .amount-btn {
+        .amount-preset {
             background: white;
             border: 1.5px solid #decbff;
             border-radius: 60px;
-            padding: 10px 20px;
-            font-weight: bold;
-            color: #6a37a3;
+            padding: 8px 20px;
             cursor: pointer;
-            transition: 0.2s;
-            flex: 1 0 auto;
-            text-align: center;
         }
-
-        .amount-btn.active {
+        .amount-preset.active {
             background: #b87eff;
-            border-color: #b87eff;
             color: white;
         }
-
         .custom-amount {
             display: flex;
             gap: 10px;
-            align-items: center;
+            margin: 15px 0;
         }
-
         .custom-amount input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px;
             border-radius: 60px;
             border: 1.5px solid #decbff;
-            background: #fffafc;
-            outline: none;
-            font-size: 1rem;
         }
-
-        .currency {
-            background: #f0e4ff;
-            padding: 10px 16px;
-            border-radius: 60px;
-            color: #6a37a3;
-            font-weight: bold;
+        .recipient-select {
+            margin: 20px 0;
         }
-
-        .recipient {
-            margin-bottom: 30px;
-        }
-
-        .recipient label {
-            font-weight: 600;
-            color: #5d3b80;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .recipient select, .recipient input {
+        .recipient-select select, .recipient-select input {
             width: 100%;
-            padding: 14px 18px;
+            padding: 12px;
             border-radius: 60px;
             border: 1.5px solid #decbff;
-            background: white;
-            font-size: 1rem;
-            outline: none;
+            margin-top: 8px;
         }
-
-        .recipient input {
-            margin-top: 10px;
-            display: none;
-        }
-
-        .btn-add {
+        .btn-add-card {
             background: linear-gradient(95deg, #b87eff, #9c58e6);
             border: none;
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border-radius: 60px;
             font-weight: bold;
-            font-size: 1.2rem;
             color: white;
-            cursor: pointer;
-            transition: 0.2s;
-            margin: 20px 0 16px;
-        }
-
-        .btn-add:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(156, 88, 230, 0.4);
-        }
-
-        .external-note {
-            font-size: 0.7rem;
-            color: #9278b0;
-            text-align: center;
-            margin: 16px 0;
-        }
-
-        .activation {
-            text-align: center;
             margin-top: 20px;
-            font-size: 0.85rem;
-            color: #a58bc2;
-            border-top: 1px solid #e2ccff;
-            padding-top: 18px;
+            cursor: pointer;
+        }
+
+        /* модалка корзины */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(80, 50, 120, 0.5);
+            backdrop-filter: blur(6px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .cart-modal-content {
+            background: white;
+            border-radius: 48px;
+            padding: 28px;
+            width: 400px;
+            max-width: 90%;
+            border: 1px solid #d0aeff;
+            position: relative;
+        }
+        .cart-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .close-cart {
+            font-size: 28px;
+            cursor: pointer;
+            color: #8a6bbf;
+        }
+        .cart-items-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-total {
+            font-weight: bold;
+            text-align: right;
+            margin: 15px 0;
+            font-size: 1.2rem;
+        }
+        .checkout-btn-cart {
+            background: #b87eff;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 60px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         footer {
+            margin-top: 50px;
             text-align: center;
-            margin-top: 24px;
             color: #9278b0;
-            font-size: 0.7rem;
+        }
+        .activation-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #aa8fcc;
         }
     </style>
 </head>
 <body>
 <canvas id="starCanvas"></canvas>
 
-<div class="container">
-    <div class="card">
-        <div class="logo">
-            <h1>✨ Robux Plus ✨</h1>
-            <p>подарочные карты Roblox в стиле Excellent Shop</p>
-        </div>
-
-        <div class="card-type">
-            <div class="type-btn" data-type="digital">💻 Digital Card</div>
-            <div class="type-btn" data-type="physical">📦 Physical Card</div>
-        </div>
-
-        <div class="amount-section">
-            <span class="amount-label">Amount (10 $ - 500 $) USD</span>
-            <div class="amount-buttons">
-                <div class="amount-btn" data-amount="10">10</div>
-                <div class="amount-btn" data-amount="25">25</div>
-                <div class="amount-btn" data-amount="50">50</div>
-                <div class="amount-btn" data-amount="100">100</div>
+<div class="app-container">
+    <!-- Авторизация -->
+    <div id="authSection" class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-title">✨ Excellent Shop ✨</div>
+            <div class="auth-sub">две вселенные robux</div>
+            <div id="authForm">
+                <div id="signinForm">
+                    <div class="input-group"><input type="text" id="loginUsername" placeholder="логин или email"></div>
+                    <div class="input-group"><input type="password" id="loginPassword" placeholder="пароль"></div>
+                    <button class="auth-btn" id="doSignIn">✨ войти ✨</button>
+                    <div class="switch-text">нет аккаунта? <span id="goToSignUp">создать</span></div>
+                    <div id="authError" class="error-msg"></div>
+                </div>
+                <div id="signupForm" style="display:none;">
+                    <div class="input-group"><input type="email" id="regEmail" placeholder="email"></div>
+                    <div class="input-group"><input type="text" id="regLogin" placeholder="логин"></div>
+                    <div class="input-group"><input type="password" id="regPass" placeholder="пароль"></div>
+                    <div class="input-group"><input type="password" id="regConfirmPass" placeholder="повтори пароль"></div>
+                    <button class="auth-btn" id="doSignUp">⭐ зарегистрироваться</button>
+                    <div class="switch-text">уже есть? <span id="goToSignIn">вход</span></div>
+                    <div id="regError" class="error-msg"></div>
+                </div>
             </div>
-            <div class="custom-amount">
-                <input type="number" id="customAmount" placeholder="своя сумма" min="10" max="500" step="1">
-                <span class="currency">USD</span>
-            </div>
-        </div>
-
-        <div class="recipient">
-            <label>Who is this for?</label>
-            <select id="recipientSelect">
-                <option value="for_me">For me</option>
-                <option value="gift">As a gift</option>
-            </select>
-            <input type="text" id="giftName" placeholder="Recipient's Roblox username">
-        </div>
-
-        <button class="btn-add" id="addToCartBtn">✨ Add to Cart ✨</button>
-        <div class="external-note">
-            Clicking the button or link above will take you to an external website provided by Roblox.
-        </div>
-        <div class="activation">
-            🔧 Aktivacija Windows
         </div>
     </div>
-    <footer>⭐ Excellent Shop — Robux Plus ⭐</footer>
+
+    <!-- Магазин (после входа) -->
+    <div id="storeSection" class="store-container">
+        <div class="header">
+            <div class="logo"><h1>✨ Excellent Shop</h1><span>фиолетовая магия robux</span></div>
+            <div class="user-info">
+                <span>👤 <span id="currentUserNick"></span></span>
+                <button class="logout-btn" id="logoutBtn">🚪 выйти</button>
+            </div>
+            <button class="cart-icon-btn" id="openCartBtn">🛒 корзина (<span id="cartCount">0</span>)</button>
+        </div>
+
+        <!-- Табы -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="robux">💎 Robux</button>
+            <button class="tab-btn" data-tab="plus">✨ Robux Plus</button>
+        </div>
+
+        <!-- Вкладка Robux -->
+        <div id="tabRobux" class="tab-content active">
+            <div class="products-grid">
+                <div class="product-card"><div class="robux-icon">💎✨</div><h3>100 Robux</h3><div class="price">49 ₽</div><button class="btn-buy" data-name="100 Robux" data-price="49">купить</button></div>
+                <div class="product-card"><div class="robux-icon">💎💎✨</div><h3>400 Robux</h3><div class="price">189 ₽</div><button class="btn-buy" data-name="400 Robux" data-price="189">купить</button></div>
+                <div class="product-card"><div class="robux-icon">💎💎💎✨</div><h3>800 Robux</h3><div class="price">359 ₽</div><button class="btn-buy" data-name="800 Robux" data-price="359">купить</button></div>
+                <div class="product-card"><div class="robux-icon">👑✨</div><h3>2000 Robux</h3><div class="price">899 ₽</div><button class="btn-buy" data-name="2000 Robux" data-price="899">купить</button></div>
+            </div>
+        </div>
+
+        <!-- Вкладка Robux Plus -->
+        <div id="tabPlus" class="tab-content">
+            <div class="plus-form">
+                <div class="card-type">
+                    <div class="type-option" data-type="digital">💻 Digital Card</div>
+                    <div class="type-option" data-type="physical">📦 Physical Card</div>
+                </div>
+                <div class="amount-section">
+                    <div class="amount-buttons">
+                        <div class="amount-preset" data-amount="10">10$</div>
+                        <div class="amount-preset" data-amount="25">25$</div>
+                        <div class="amount-preset" data-amount="50">50$</div>
+                        <div class="amount-preset" data-amount="100">100$</div>
+                    </div>
+                    <div class="custom-amount">
+                        <input type="number" id="customAmount" placeholder="своя сумма (10-500)" min="10" max="500">
+                        <span>USD</span>
+                    </div>
+                </div>
+                <div class="recipient-select">
+                    <select id="recipientSelect">
+                        <option value="me">For me</option>
+                        <option value="gift">As a gift</option>
+                    </select>
+                    <input type="text" id="giftName" placeholder="Никнейм получателя" style="display:none;">
+                </div>
+                <button class="btn-add-card" id="addCardToCart">✨ Add to Cart ✨</button>
+                <div class="activation-text">🔧 Aktivacija Windows</div>
+            </div>
+        </div>
+
+        <footer>⭐ Excellent Shop — сияй с нами ⭐</footer>
+    </div>
+</div>
+
+<!-- Модалка корзины -->
+<div id="cartModal" class="cart-modal">
+    <div class="cart-modal-content">
+        <div class="cart-modal-header">
+            <h3>🛒 ваша корзина</h3>
+            <span class="close-cart" id="closeCartBtn">&times;</span>
+        </div>
+        <div class="cart-items-list" id="cartItemsList">
+            <p>корзина пуста</p>
+        </div>
+        <div class="cart-total" id="modalCartTotal">Итого: 0 ₽</div>
+        <button class="checkout-btn-cart" id="modalCheckoutBtn">💫 оформить заказ</button>
+    </div>
 </div>
 
 <script>
-    // ЗВЁЗДОЧКИ
+    // === звездочки ===
     const canvas = document.getElementById('starCanvas');
     let ctx = canvas.getContext('2d');
     let stars = [];
-
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
-
-    function createStar() {
-        return {
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 4 + 2,
-            speedY: Math.random() * 1.5 + 0.7,
-            opacity: Math.random() * 0.6 + 0.3,
-        };
-    }
-
-    for (let i = 0; i < 200; i++) stars.push(createStar());
-
-    function drawStar(ctx, x, y, size, opacity) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.beginPath();
-        let spikes = 5;
-        let outerRadius = size;
-        let innerRadius = size * 0.4;
-        let rot = Math.PI / 2 * 3;
-        let step = Math.PI / spikes;
-        ctx.moveTo(0, -outerRadius);
-        for (let i = 0; i < spikes; i++) {
-            let x1 = Math.sin(rot) * innerRadius;
-            let y1 = -Math.cos(rot) * innerRadius;
-            ctx.lineTo(x1, y1);
-            rot += step;
-            let x2 = Math.sin(rot) * outerRadius;
-            let y2 = -Math.cos(rot) * outerRadius;
-            ctx.lineTo(x2, y2);
-            rot += step;
+    function createStar() { return { x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 4 + 2, speedY: Math.random() * 1.5 + 0.7, opacity: Math.random() * 0.6 + 0.3 }; }
+    for(let i=0;i<200;i++) stars.push(createStar());
+    function drawStar(ctx,x,y,size,opacity) {
+        ctx.save(); ctx.translate(x,y); ctx.beginPath();
+        let spikes=5, outer=size, inner=size*0.4, rot=Math.PI/2*3, step=Math.PI/spikes;
+        ctx.moveTo(0,-outer);
+        for(let i=0;i<spikes;i++) {
+            let x1=Math.sin(rot)*inner, y1=-Math.cos(rot)*inner;
+            ctx.lineTo(x1,y1); rot+=step;
+            let x2=Math.sin(rot)*outer, y2=-Math.cos(rot)*outer;
+            ctx.lineTo(x2,y2); rot+=step;
         }
-        ctx.closePath();
-        ctx.fillStyle = `rgba(255, 220, 180, ${opacity})`;
-        ctx.fill();
-        ctx.restore();
+        ctx.closePath(); ctx.fillStyle=`rgba(255,220,180,${opacity})`; ctx.fill(); ctx.restore();
     }
-
     function drawStars() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let star of stars) {
-            drawStar(ctx, star.x, star.y, star.size, star.opacity);
-            star.y += star.speedY;
-            if (star.y > canvas.height) {
-                star.y = -10;
-                star.x = Math.random() * canvas.width;
-            }
-        }
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for(let s of stars) { drawStar(ctx,s.x,s.y,s.size,s.opacity); s.y+=s.speedY; if(s.y>canvas.height) { s.y=-10; s.x=Math.random()*canvas.width; } }
         requestAnimationFrame(drawStars);
     }
     drawStars();
 
-    // ----- логика выбора типа карты -----
-    let selectedType = 'digital';
-    let selectedAmount = 10;
+    // === авторизация (как раньше) ===
+    let currentUser = null;
+    function loadUsers() {
+        let users = localStorage.getItem('excellent_users');
+        if(!users) { let def = { "star": { login: "star", password: "123", email: "star@excellent.ru" } }; localStorage.setItem('excellent_users', JSON.stringify(def)); return def; }
+        return JSON.parse(users);
+    }
+    function saveUsers(users) { localStorage.setItem('excellent_users', JSON.stringify(users)); }
+    function showAuth(show) { document.getElementById('authSection').style.display = show ? 'flex' : 'none'; document.getElementById('storeSection').style.display = show ? 'none' : 'block'; }
+    function updateUI() { if(currentUser) { document.getElementById('currentUserNick').innerText = currentUser; showAuth(false); } else showAuth(true); }
 
-    const typeBtns = document.querySelectorAll('.type-btn');
-    const amountBtns = document.querySelectorAll('.amount-btn');
-    const customAmountInput = document.getElementById('customAmount');
-    const recipientSelect = document.getElementById('recipientSelect');
-    const giftNameInput = document.getElementById('giftName');
-
-    typeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            typeBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedType = btn.getAttribute('data-type');
-        });
+    document.getElementById('doSignUp')?.addEventListener('click',()=>{
+        let email=document.getElementById('regEmail').value.trim(), login=document.getElementById('regLogin').value.trim(), pass=document.getElementById('regPass').value.trim(), confirm=document.getElementById('regConfirmPass').value.trim(), err=document.getElementById('regError');
+        if(!email||!login||!pass) { err.innerText='заполни всё'; return; }
+        if(pass!==confirm) { err.innerText='пароли не совпадают'; return; }
+        if(!email.includes('@')) { err.innerText='некорректный email'; return; }
+        let users=loadUsers();
+        if(users[login]) { err.innerText='логин занят'; return; }
+        for(let k in users) if(users[k].email===email) { err.innerText='email уже используется'; return; }
+        users[login]={login,password:pass,email}; saveUsers(users);
+        err.innerText='✅ создан! войдите';
+        document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block';
     });
-    // активируем первый по умолчанию
-    typeBtns[0].classList.add('active');
-
-    amountBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            amountBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedAmount = parseInt(btn.getAttribute('data-amount'));
-            customAmountInput.value = '';
-        });
+    document.getElementById('doSignIn')?.addEventListener('click',()=>{
+        let val=document.getElementById('loginUsername').value.trim(), pwd=document.getElementById('loginPassword').value.trim(), users=loadUsers(), found=null;
+        for(let k in users) if(k===val||users[k].email===val) if(users[k].password===pwd) found=k;
+        if(found) { currentUser=found; localStorage.setItem('excellent_current',found); updateUI(); initEverything(); }
+        else document.getElementById('authError').innerText='неверно';
     });
-    amountBtns[0].classList.add('active');
+    document.getElementById('goToSignUp')?.addEventListener('click',()=>{ document.getElementById('signinForm').style.display='none'; document.getElementById('signupForm').style.display='block'; });
+    document.getElementById('goToSignIn')?.addEventListener('click',()=>{ document.getElementById('signupForm').style.display='none'; document.getElementById('signinForm').style.display='block'; });
+    document.getElementById('logoutBtn')?.addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('excellent_current'); showAuth(true); cart=[]; updateCartUI(); });
 
-    customAmountInput.addEventListener('input', (e) => {
-        let val = parseInt(e.target.value);
-        if (!isNaN(val) && val >= 10 && val <= 500) {
-            selectedAmount = val;
-            amountBtns.forEach(b => b.classList.remove('active'));
-        } else if (e.target.value === '') {
-            // оставляем последний выбранный из кнопок
-        } else {
-            e.target.value = '';
-        }
-    });
-
-    recipientSelect.addEventListener('change', () => {
-        if (recipientSelect.value === 'gift') {
-            giftNameInput.style.display = 'block';
-        } else {
-            giftNameInput.style.display = 'none';
-        }
-    });
-    giftNameInput.style.display = 'none';
-
-    // ----- телеграм отправка (как в excellent shop) -----
+    // === корзина (глобальная) ===
+    let cart = [];
     const TELEGRAM_TOKEN = "8963187856:AAFTu9IrZmSitQscE1FB5MTREDhkSMEAzeg";
-    let CHAT_ID = localStorage.getItem('tg_chat_id_robuxplus');
+    let CHAT_ID = localStorage.getItem('tg_chat_id_excellent');
 
     async function fetchChatId() {
         try {
             const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/getUpdates`);
             const data = await res.json();
-            if (data.ok && data.result.length) {
-                const last = data.result[data.result.length-1];
-                const cid = last.message?.chat?.id || last.callback_query?.message?.chat?.id;
-                if (cid) {
-                    CHAT_ID = cid;
-                    localStorage.setItem('tg_chat_id_robuxplus', CHAT_ID);
-                    alert('✨ телеграм готов, можно отправлять ✨');
-                    return true;
-                }
+            if(data.ok && data.result.length) {
+                let last=data.result[data.result.length-1];
+                let cid=last.message?.chat?.id || last.callback_query?.message?.chat?.id;
+                if(cid) { CHAT_ID=cid; localStorage.setItem('tg_chat_id_excellent',CHAT_ID); alert('✨ телеграм готов'); return true; }
             }
-            alert('✨ напиши @ExcellentShopBot любое сообщение ✨');
-        } catch(e) { alert('ошибка подключения'); }
+            alert('✨ напиши @ExcellentShopBot любое сообщение');
+        } catch(e) { alert('ошибка'); }
         return false;
     }
-
     function showMessage(msg) {
-        let div = document.createElement('div');
-        div.innerText = msg;
-        div.style.cssText = 'position:fixed; bottom:20px; left:20px; background:#e2ccff; color:#6a37a3; padding:10px 20px; border-radius:40px; z-index:9999; font-weight:bold; backdrop-filter:blur(4px);';
-        document.body.appendChild(div);
-        setTimeout(()=>div.remove(), 2500);
+        let d=document.createElement('div'); d.innerText=msg; d.style.cssText='position:fixed; bottom:20px; left:20px; background:#e2ccff; color:#6a37a3; padding:10px 20px; border-radius:40px; z-index:9999;';
+        document.body.appendChild(d); setTimeout(()=>d.remove(),2500);
     }
-
-    document.getElementById('addToCartBtn').addEventListener('click', async () => {
-        let amount = selectedAmount;
-        // проверка кастомного поля
-        const customVal = parseInt(customAmountInput.value);
-        if (!isNaN(customVal) && customVal >= 10 && customVal <= 500) {
-            amount = customVal;
-        } else if (customAmountInput.value !== '') {
-            alert('сумма должна быть от 10 до 500 USD');
-            return;
-        }
-
-        let recipient = '';
-        if (recipientSelect.value === 'for_me') {
-            recipient = 'For me (владельцу)';
-        } else {
-            const giftName = giftNameInput.value.trim();
-            if (!giftName) {
-                alert('укажи никнейм получателя подарка');
-                return;
-            }
-            recipient = `Gift for: ${giftName}`;
-        }
-
-        const cardType = selectedType === 'digital' ? 'Digital Card' : 'Physical Card';
-        const messageText = `✨ ROBUX PLUS (Excellent Shop) ✨\n💳 Карта: ${cardType}\n💰 Сумма: ${amount} USD\n👤 Получатель: ${recipient}`;
-
-        if (!CHAT_ID) {
-            const confirmTelegram = confirm('Телеграм не настроен. Настроить сейчас?');
-            if (confirmTelegram) await fetchChatId();
-            if (!CHAT_ID) {
-                alert('отмена. данные не отправлены');
-                return;
-            }
-        }
-
-        try {
-            const resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: messageText })
+    function addItemToCart(item) {
+        cart.push(item);
+        updateCartUI();
+        showMessage(`✨ ${item.name} добавлен`);
+    }
+    function updateCartUI() {
+        let countSpan = document.getElementById('cartCount');
+        if(countSpan) countSpan.innerText = cart.length;
+        // обновляем модалку если открыта
+        renderCartModal();
+    }
+    function renderCartModal() {
+        let container = document.getElementById('cartItemsList');
+        let totalSpan = document.getElementById('modalCartTotal');
+        if(!container) return;
+        if(cart.length===0) { container.innerHTML='<p>✨ корзина пуста ✨</p>'; totalSpan.innerText='Итого: 0 ₽'; return; }
+        let total=0;
+        let html='';
+        cart.forEach((item,idx)=>{
+            let price = item.price || 0;
+            total+=price;
+            html+=`<div class="cart-item"><span>${item.name}</span><span>${price} ₽ <button class="remove-item" data-idx="${idx}" style="background:#ffc4c4; border:none; border-radius:30px; padding:2px 10px; margin-left:8px;">x</button></span></div>`;
+        });
+        container.innerHTML=html;
+        totalSpan.innerText=`Итого: ${total} ₽`;
+        document.querySelectorAll('.remove-item').forEach(btn=>{
+            btn.addEventListener('click',(e)=>{
+                let idx=parseInt(btn.getAttribute('data-idx'));
+                cart.splice(idx,1);
+                updateCartUI();
+                showMessage('товар удалён');
             });
-            const json = await resp.json();
-            if (json.ok) {
-                showMessage('✅ Заказ добавлен! Ссылка на оплату скоро придёт в Telegram.');
-                // сброс формы (опционально)
-                customAmountInput.value = '';
-                if (giftNameInput.style.display === 'block') giftNameInput.value = '';
-            } else {
-                alert('❌ Ошибка при отправке, попробуй позже');
-            }
-        } catch(e) {
-            alert('Ошибка соединения');
-        }
+        });
+    }
+    // модалка корзины
+    const cartModal = document.getElementById('cartModal');
+    const openCartBtn = document.getElementById('openCartBtn');
+    const closeCartBtn = document.getElementById('closeCartBtn');
+    openCartBtn?.addEventListener('click',()=>{ renderCartModal(); cartModal.style.display='flex'; });
+    closeCartBtn?.addEventListener('click',()=>{ cartModal.style.display='none'; });
+    window.addEventListener('click',(e)=>{ if(e.target===cartModal) cartModal.style.display='none'; });
+
+    // === оформление заказа через телеграм ===
+    document.getElementById('modalCheckoutBtn')?.addEventListener('click', async () => {
+        if(cart.length===0) { alert('корзина пуста'); return; }
+        if(!CHAT_ID) { alert('настрой телеграм'); await fetchChatId(); if(!CHAT_ID) return; }
+        let total=cart.reduce((s,i)=>s+(i.price||0),0);
+        let itemsText=cart.map(i=>`${i.name} — ${i.price||0} ₽`).join('\n');
+        let msg=`✨ EXCELLENT SHOP (заказ) ✨\n👤 ${currentUser}\n📦 Товары:\n${itemsText}\n💰 Итого: ${total} ₽`;
+        try {
+            let resp=await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({chat_id:CHAT_ID, text:msg}) });
+            let json=await resp.json();
+            if(json.ok) { alert('✅ заказ принят! оператор свяжется'); cart=[]; updateCartUI(); cartModal.style.display='none'; }
+            else alert('ошибка отправки');
+        } catch(e){ alert('ошибка'); }
     });
 
-    // при загрузке проверяем chat id
-    if (!CHAT_ID) {
-        setTimeout(() => {
-            if (confirm('Для отправки заказов нужен Telegram. Настроить сейчас?')) fetchChatId();
-        }, 800);
+    // === логика табов ===
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+        document.getElementById(`tab${tabId==='robux'?'Robux':'Plus'}`).classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(btn=>{
+            if(btn.getAttribute('data-tab')===tabId) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
     }
+    document.querySelectorAll('.tab-btn').forEach(btn=>{
+        btn.addEventListener('click',()=> switchTab(btn.getAttribute('data-tab')));
+    });
+
+    // === добавление обычных товаров ===
+    function bindBuyButtons() {
+        document.querySelectorAll('.btn-buy').forEach(btn=>{
+            btn.removeEventListener('click', buyHandler);
+            btn.addEventListener('click', buyHandler);
+        });
+        function buyHandler(e) {
+            let name=this.getAttribute('data-name');
+            let price=parseInt(this.getAttribute('data-price'));
+            addItemToCart({ name: name, price: price });
+        }
+    }
+
+    // === robux plus форма ===
+    let selectedTypeCard = 'digital';
+    let selectedAmountCard = 10;
+    document.querySelectorAll('.type-option').forEach(opt=>{
+        opt.addEventListener('click',()=>{
+            document.querySelectorAll('.type-option').forEach(o=>o.classList.remove('active'));
+            opt.classList.add('active');
+            selectedTypeCard=opt.getAttribute('data-type');
+        });
+    });
+    document.querySelectorAll('.amount-preset').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+            document.querySelectorAll('.amount-preset').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedAmountCard=parseInt(btn.getAttribute('data-amount'));
+            document.getElementById('customAmount').value='';
+        });
+    });
+    document.getElementById('customAmount')?.addEventListener('input',(e)=>{
+        let val=parseInt(e.target.value);
+        if(!isNaN(val) && val>=10 && val<=500) { selectedAmountCard=val; document.querySelectorAll('.amount-preset').forEach(b=>b.classList.remove('active')); }
+    });
+    document.getElementById('recipientSelect')?.addEventListener('change',()=>{
+        let giftField=document.getElementById('giftName');
+        if(document.getElementById('recipientSelect').value==='gift') giftField.style.display='block';
+        else giftField.style.display='none';
+    });
+    document.getElementById('addCardToCart')?.addEventListener('click',()=>{
+        let amount=selectedAmountCard;
+        let customVal=parseInt(document.getElementById('customAmount').value);
+        if(!isNaN(customVal) && customVal>=10 && customVal<=500) amount=customVal;
+        else if(document.getElementById('customAmount').value !== '') { alert('сумма от 10 до 500'); return; }
+        let recipient='';
+        if(document.getElementById('recipientSelect').value==='me') recipient='For me';
+        else {
+            let gift=document.getElementById('giftName').value.trim();
+            if(!gift) { alert('укажи никнейм получателя'); return; }
+            recipient=`Gift for ${gift}`;
+        }
+        let typeCard=selectedTypeCard==='digital'?'Digital Card':'Physical Card';
+        let itemName = `Robux Plus: ${typeCard} ${amount}$ (${recipient})`;
+        addItemToCart({ name: itemName, price: Math.round(amount * 80) }); // примерная цена в руб
+    });
+
+    function initEverything() {
+        bindBuyButtons();
+        updateCartUI();
+        // активная вкладка по умолчанию robux
+        switchTab('robux');
+    }
+
+    const savedUser = localStorage.getItem('excellent_current');
+    if(savedUser && loadUsers()[savedUser]) { currentUser=savedUser; updateUI(); initEverything(); }
+    else showAuth(true);
+    if(!CHAT_ID) setTimeout(()=>{ if(confirm('для отправки заказов нужен телеграм настроить?')) fetchChatId(); }, 800);
 </script>
 </body>
 </html>
